@@ -54,17 +54,44 @@ def health():
     except Exception:
         return {"status": "degraded", "database": "down"}
 
+# get all users
 @app.get("/users")
 def get_items():
     req = list(users.find({}, {"_id": 0}))
     return req
 
+# get all collections
 @app.get("/collections")
 def get_collections():
     req = list(collections.find({}, {"_id": 0}))
     return req
 
+# get all cards
 @app.get("/cards")
 def get_cards():
     req = list(cards.find({}, {"_id": 0}))
     return req
+
+# TODO: create, update, delete
+# get profile from {user}, including all collections
+@app.get("/user/{user}")
+def get_user(user: str):
+    return {
+        "user_id": "",
+        "user_name": user,
+        "collections": []
+    }
+
+# TODO: create, update, delete
+# get {collection} from {user}, including all cards
+@app.get("/user/{user}/collection/{collection}")
+def get_collection(user: str, collection: str):
+    return {
+        "user_id": "",
+        "user_name": user,
+        "collection_id": "",
+        "collection_name": collection,
+        "cards": []
+    }
+
+# TODO: create, update, delete Card
