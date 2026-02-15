@@ -95,3 +95,36 @@ def get_collection(user: str, collection: str):
     }
 
 # TODO: create, update, delete Card
+
+
+# GET all users (locked)
+# GET user by name
+# GET user by user_id
+# POST user
+# PUT user
+# DELETE user
+
+# GET all collections (locked)
+# GET collection by collection_id
+# POST collection by user_id
+# PUT collection by collection_id
+# DELETE collection by collection_id
+
+# GET all cards (locked)
+# GET card by card_id
+# POST card by collection_id
+# PUT card by card_id
+# DELETE card by card_id
+
+# GET all categories
+
+# POST signup
+# POST login
+# DELETE login
+
+# GET health
+# startup
+
+# GET all public collections?
+# POST save collection?
+# GET all saved collections?
