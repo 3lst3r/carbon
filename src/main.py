@@ -1,60 +1,28 @@
 from fastapi import FastAPI
-from pymongo import MongoClient
-import os
-import uuid
-import bcrypt
+from fastapi.responses import RedirectResponse
+
 from src import MOCKUP
-
-MONGO_HOST = os.getenv("MONGO_HOST", "localhost")
-MONGO_PORT = int(os.getenv("MONGO_PORT", 27017))
-
-client = MongoClient(f"mongodb://{MONGO_HOST}:{MONGO_PORT}")
-db = client["carbon_db"]
-users = db["users"]
-collections = db["collections"]
-cards = db["cards"]
+from src import authentication
+from src import cards
+from src import categories
+from src import collections
+from src import database
+from src import users
 
 app = FastAPI()
 
 
 @app.on_event("startup")
 def startup_event():
-    # if users.count_documents({}) == 0:
-    #     user_id = str(uuid.uuid4())
-    #     collection_id = str(uuid.uuid4())
-    #     card_id = str(uuid.uuid4())
-    #     users.insert_one({
-    #         "user_id": user_id,
-    #         "name": "test_user",
-    #         "pass_hash": bcrypt.hashpw(b"password", bcrypt.gensalt())
-    #     })
-    #     collections.insert_one({
-    #         "user_id": user_id,
-    #         "collection_id": collection_id,
-    #         "title": "this is the title of the collection",
-    #         "description": "this is the description of the collection",
-    #         "color": "FFFFFF"
-    #     })
-    #     cards.insert_one({
-    #         "collection_id": collection_id,
-    #         "card_id": card_id,
-    #         "front": "this is the front side",
-    #         "back": "this is the back side"
-    #     })
-    return
-
+    database.startup()
 
 @app.get("/")
 def root():
-    return {"status": "ok"}
+    return RedirectResponse(url="/docs")
 
 @app.get("/health")
 def health():
-    try:
-        db.command("ping")
-        return {"status": "ok", "database": "up"}
-    except Exception:
-        return {"status": "degraded", "database": "down"}
+    return database.health()
 
 @app.get("/users")
 def get_users():
@@ -131,20 +99,6 @@ def post_save_collection(collection: str):
 @app.get("/saved")
 def post_save_collection():
     return MOCKUP.GET_SAVED_COLLECTIONS
-
-# TODO: create, update, delete
-# get {collection} from {user}, including all cards
-@app.get("/user/{user}/collection/{collection}")
-def get_collection(user: str, collection: str):
-    return {
-        "user_id": "",
-        "user_name": user,
-        "collection_id": "",
-        "collection_name": collection,
-        "cards": []
-    }
-
-# TODO: create, update, delete Card
 
 
 # GET all users (locked)
