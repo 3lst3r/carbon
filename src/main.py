@@ -98,7 +98,7 @@ def post_save_collection(collection: str):
     return MOCKUP.POST_SAVE_COLLECTION
 
 @app.get("/api/saved")
-def post_save_collection():
+def get_save_collection():
     return MOCKUP.GET_SAVED_COLLECTIONS
 
 
