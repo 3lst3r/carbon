@@ -14,7 +14,8 @@ app = FastAPI()
 
 @app.on_event("startup")
 def startup_event():
-    database.startup()
+    # database.startup()
+    return
 
 @app.get("/")
 def root():
@@ -24,79 +25,79 @@ def root():
 def health():
     return database.health()
 
-@app.get("/users")
+@app.get("/api/users")
 def get_users():
     return MOCKUP.GET_ALL_USERS
 
-@app.get("/user/{user}")
+@app.get("/api/user/{user}")
 def get_user(user: str):
     return MOCKUP.GET_USER
 
-@app.post("/user/{user}")
+@app.post("/api/user/{user}")
 def post_user(user: str):
     return MOCKUP.POST_USER
 
-@app.put("/user/{user}")
+@app.put("/api/user/{user}")
 def put_user(user: str):
     return MOCKUP.PUT_USER
 
-@app.delete("/user/{user}")
+@app.delete("/api/user/{user}")
 def delete_user(user: str):
     return MOCKUP.DELETE_USER
 
-@app.get("/collections")
+@app.get("/api/collections")
 def get_collections():
     return MOCKUP.GET_ALL_COLLECTIONS
 
-@app.get("/collection/{collection}")
+@app.get("/api/collection/{collection}")
 def get_collection(collection: str):
     return MOCKUP.GET_PUT_COLLECTION
 
-@app.put("/collection/{collection}")
+@app.put("/api/collection/{collection}")
 def put_collection(collection: str):
     return MOCKUP.GET_PUT_COLLECTION
 
-@app.delete("/collection/{collection}")
+@app.delete("/api/collection/{collection}")
 def delete_collection(collection: str):
     return MOCKUP.DELETE_COLLECTION
 
-@app.get("/cards")
+@app.get("/api/cards")
 def get_cards():
     return MOCKUP.GET_ALL_CARDS
 
-@app.get("/card/{card}")
+@app.get("/api/card/{card}")
 def get_card(card: str):
     return MOCKUP.GET_PUT_CARD
 
-@app.put("/card/{card}")
+@app.put("/api/card/{card}")
 def put_card(card: str):
     return MOCKUP.GET_PUT_CARD
 
-@app.post("/card/{card}")
+@app.post("/api/card/{card}")
 def post_cards(card: str):
     return MOCKUP.POST_CARDS
 
-@app.delete("/card/{card}")
+@app.delete("/api/card/{card}")
 def delete_card(card: str):
     return MOCKUP.DELETE_CARD
 
-@app.get("/categories")
+@app.get("/api/categories")
 def get_categories():
     return MOCKUP.GET_ALL_CATEGORIES
 
-@app.post("/signup")
+@app.post("/api/signup")
 def post_signup():
     return MOCKUP.POST_SIGNUP_LOGIN
 
-@app.post("/login")
+@app.post("/api/login")
 def post_login():
     return MOCKUP.POST_SIGNUP_LOGIN
 
-@app.post("/save/{collection}")
+@app.post("/api/save/{collection}")
 def post_save_collection(collection: str):
     return MOCKUP.POST_SAVE_COLLECTION
 
-@app.get("/saved")
+@app.get("/api/saved")
 def post_save_collection():
     return MOCKUP.GET_SAVED_COLLECTIONS
 

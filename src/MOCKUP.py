@@ -49,7 +49,6 @@ GET_USER = {
     ]
 }
 
-
 # POST user
 POST_USER = {
     "userId": "example-uuid-user-4",
