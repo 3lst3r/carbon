@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
+from urllib.parse import unquote
 
 from src import MOCKUP
 from src import authentication
@@ -14,7 +15,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 def startup_event():
-    # database.startup()
+    database.startup()
     return
 
 @app.get("/")
@@ -29,12 +30,16 @@ def health():
 def get_users():
     return MOCKUP.GET_ALL_USERS
 
-@app.get("/api/user/{user}")
-def get_user(user: str):
-    return MOCKUP.GET_USER
+@app.get("/api/user_by_email/{user}", status_code=200)
+def get_user_by_email(email: str):
+    return database.read_user_by_email(email=unquote(email))
+
+@app.get("/api/user/{name}")
+def get_user_by_name(name: str):
+    return database.read_user_by_name(name=name)
 
 @app.post("/api/user/{user}")
-def post_user(user: str):
+def post_user(user_id: str):
     return MOCKUP.POST_USER
 
 @app.put("/api/user/{user}")

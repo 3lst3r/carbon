@@ -2,3 +2,5 @@ fastapi[standard]
 uvicorn[standard]
 pymongo
 bcrypt
+pydantic
+python-dotenv
