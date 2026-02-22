@@ -30,7 +30,7 @@ def health():
 def get_users():
     return MOCKUP.GET_ALL_USERS
 
-@app.get("/api/user_by_email/{user}", status_code=200)
+@app.get("/api/user_by_email/{email}", status_code=200)
 def get_user_by_email(email: str):
     return database.read_user_by_email(email=unquote(email))
 
@@ -38,7 +38,7 @@ def get_user_by_email(email: str):
 def get_user_by_name(name: str):
     return database.read_user_by_name(name=name)
 
-@app.post("/api/user/{user}")
+@app.post("/api/user")
 def post_user(user_id: str):
     return MOCKUP.POST_USER
 
@@ -54,9 +54,9 @@ def delete_user(user: str):
 def get_collections():
     return MOCKUP.GET_ALL_COLLECTIONS
 
-@app.get("/api/collection/{collection}")
-def get_collection(collection: str):
-    return MOCKUP.GET_PUT_COLLECTION
+@app.get("/api/collection/{collection_id}")
+def get_collection(collection_id: str):
+    return database.read_collection(collection_id=collection_id)
 
 @app.put("/api/collection/{collection}")
 def put_collection(collection: str):
@@ -70,9 +70,9 @@ def delete_collection(collection: str):
 def get_cards():
     return MOCKUP.GET_ALL_CARDS
 
-@app.get("/api/card/{card}")
-def get_card(card: str):
-    return MOCKUP.GET_PUT_CARD
+@app.get("/api/card/{card_id}")
+def get_card(card_id: str):
+    return database.read_card(card_id=card_id)
 
 @app.put("/api/card/{card}")
 def put_card(card: str):
@@ -102,9 +102,9 @@ def post_login():
 def post_save_collection(collection: str):
     return MOCKUP.POST_SAVE_COLLECTION
 
-@app.get("/api/saved")
-def get_save_collection():
-    return MOCKUP.GET_SAVED_COLLECTIONS
+@app.get("/api/saved/{user_id}")
+def get_save_collection(user_id: str):
+    return database.read_favorites(user_id=user_id)
 
 
 # GET all users (locked)

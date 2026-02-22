@@ -51,7 +51,7 @@ def create_user(name: str, email: str, password: str):
 
 def read_user_by_email(email: str):
     try:
-        res = users_table.find_one({"email": email}, {"_id": 0})
+        res = users_table.find_one({"email": email}, {"_id": 0, "pass_hash": 0})
         return res
     except:
         raise HTTPException(status_code=500)
@@ -158,7 +158,7 @@ def read_card(card_id: str):
 
 def read_cards_from_collection(collection_id: str):
     try:
-        res = cards_table.find({"collectionId": collection_id}, {"_id": 0})
+        res = cards_table.find({"collectionId": collection_id}, {"_id": 0}).to_list()
         return res
     except:
         raise HTTPException(status_code=500)
@@ -199,7 +199,7 @@ def create_favorite(user_id: str, collection_id: str):
 
 def read_favorites(user_id: str):
     try:
-        res = favorites_table.find({"userId": user_id}, {"_id": 0})
+        res = favorites_table.find({"userId": user_id}, {"_id": 0}).to_list()
         return res
     except:
         raise HTTPException(status_code=500)
