@@ -2,13 +2,10 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from urllib.parse import unquote
 
+from src import models
 from src import MOCKUP
 from src import authentication
-from src import cards
-from src import categories
-from src import collections
 from src import database
-from src import users
 
 app = FastAPI()
 
@@ -28,7 +25,7 @@ def health():
 
 @app.get("/api/users")
 def get_users():
-    return MOCKUP.GET_ALL_USERS
+    return database.get_all_users()
 
 @app.get("/api/user_by_email/{email}", status_code=200)
 def get_user_by_email(email: str):
@@ -38,17 +35,17 @@ def get_user_by_email(email: str):
 def get_user_by_name(name: str):
     return database.read_user_by_name(name=name)
 
-@app.post("/api/user")
-def post_user(user_id: str):
-    return MOCKUP.POST_USER
+@app.post("/api/user", status_code=201)
+async def post_user(user: models.PostUser):
+    return database.create_user(name=user.name, email=user.email, password=user.password)
 
-@app.put("/api/user/{user}")
-def put_user(user: str):
-    return MOCKUP.PUT_USER
+@app.put("/api/user", status_code=201)
+def put_user(user: models.PutUser):
+    return database.update_user(user_id=user.userId, name=user.name, email=user.email, password=user.password)
 
-@app.delete("/api/user/{user}")
-def delete_user(user: str):
-    return MOCKUP.DELETE_USER
+@app.delete("/api/user/{user_id}")
+def delete_user(user_id: str):
+    return database.delete_user(user_id)
 
 @app.get("/api/collections")
 def get_collections():

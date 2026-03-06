@@ -35,59 +35,96 @@ def health():
     except Exception:
         return {"status": "degraded", "database": "down"}
 
+def get_all_users():
+    try:
+        res = users_table.find({}, {"_id": 0, "pass_hash": 0}).to_list()
+        return res
+    except:
+        raise HTTPException(status_code=500)
+
 def create_user(name: str, email: str, password: str):
     try:
-        user_id = uuid.uuid4()
+        user_id = str(uuid.uuid4())
         user = Models.User(
             userId=user_id,
             name=name,
             email=email,
-            pass_hash=bcrypt.hashpw(bytes(password), bcrypt.gensalt()),
+            pass_hash=bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()),
             createdAt=int(time.time())
         )
-        users_table.insert_one(user.model_dump_json())
-    except:
+        users_table.insert_one(user.model_dump())
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=400)
 
 def read_user_by_email(email: str):
     try:
         res = users_table.find_one({"email": email}, {"_id": 0, "pass_hash": 0})
-        return res
-    except:
+        return {
+            "userId": res["userId"],
+            "name": res["name"],
+            "email": res["email"],
+            "createdAt": res["createdAt"],
+            "collections": get_collections_from_user_id(res["userId"])
+        }
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500)
 
 def read_user_by_user_id(user_id: str):
     try:
         res = users_table.find_one({"userId": user_id}, {"_id": 0})
-        return res
+        return {
+            "userId": res["userId"],
+            "name": res["name"],
+            "email": res["email"],
+            "createdAt": res["createdAt"],
+            "collections": get_collections_from_user_id(res["userId"])
+        }
     except:
         raise HTTPException(status_code=500)
 
 def read_user_by_name(name: str):
     try:
-        print(name)
         res = users_table.find_one({"name": name}, {"_id": 0, "pass_hash": 0})
-        return res
+        return {
+            "userId": res["userId"],
+            "name": res["name"],
+            "email": res["email"],
+            "createdAt": res["createdAt"],
+            "collections": get_collections_from_user_id(res["userId"])
+        }
     except:
         raise HTTPException(status_code=500)
 
 def update_user(user_id: str, name: str, email: str, password: str):
     try:
-        user = Models.User(
-            userId=user_id,
-            name=name,
-            email=email,
-            pass_hash=bcrypt.hashpw(bytes(password), bcrypt.gensalt()),
-            createdAt=int(time.time())
+        users_table.find_one_and_update(
+            {"userId": user_id}, 
+            {
+                "$set": {
+                    "name": name,
+                    "email": email,
+                    "pass_hash": bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+                }
+            }
         )
-        users_table.find_one_and_update({"userId": user_id}, user)
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500)
 
 def delete_user(user_id: str):
     try:
         users_table.find_one_and_delete({"userId": user_id})
     except:
+        raise HTTPException(status_code=500)
+
+def get_collections_from_user_id(user_id: str):
+    try:
+        res = collections_table.find({"userId": user_id}, {"_id": 0}).to_list()
+        return res
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500)
 
 def create_collection(user_id: str, title: str, description: str, color: Models.Color, public: bool):

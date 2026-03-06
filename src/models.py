@@ -37,3 +37,16 @@ class Favorite(BaseModel):
     collectionId: str
     favoriteId: str
     createdAt: str
+
+
+
+class PostUser(BaseModel):
+    name: str
+    email: str
+    password: str
+
+class PutUser(BaseModel):
+    userId: str
+    name: str
+    email: str
+    password: str
