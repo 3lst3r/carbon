@@ -1,4 +1,3 @@
-import os
 import bcrypt
 import uuid
 import time
@@ -7,14 +6,9 @@ from fastapi import HTTPException
 from pymongo import MongoClient
 from src import models as Models
 from src import MOCKUP_OBJECTS as Mockups
-from dotenv import load_dotenv
+from src import config
 
-load_dotenv()
-
-MONGO_HOST = os.getenv("MONGO_HOST", "localhost")
-MONGO_PORT = int(os.getenv("MONGO_PORT", 27017))
-
-client = MongoClient(f"mongodb://{MONGO_HOST}:{MONGO_PORT}")
+client = MongoClient(f"mongodb://{config.MONGO_HOST}:{config.MONGO_PORT}")
 db = client["carbon_db"]
 users_table = db["users"]
 collections_table = db["collections"]
@@ -23,6 +17,10 @@ favorites_table = db["favorites"]
 
 
 def startup():
+    if config.WIPE_DATABASE_ON_RESTART:
+        users_table.delete_many({})
+        collections_table.delete_many({})
+        cards_table.delete_many({})
     if users_table.count_documents({}) == 0:
         users_table.insert_one(Mockups.user.model_dump())
         collections_table.insert_one(Mockups.collection.model_dump())
@@ -119,6 +117,13 @@ def delete_user(user_id: str):
     except:
         raise HTTPException(status_code=500)
 
+def get_all_collections():
+    try:
+        res = collections_table.find({}, {"_id": 0}).to_list()
+        return res
+    except:
+        raise HTTPException(status_code=500)
+
 def get_collections_from_user_id(user_id: str):
     try:
         res = collections_table.find({"userId": user_id}, {"_id": 0}).to_list()
@@ -146,24 +151,34 @@ def create_collection(user_id: str, title: str, description: str, color: Models.
 def read_collection(collection_id: str):
     try:
         res = collections_table.find_one({"collectionId": collection_id}, {"_id": 0})
-        return res
+        return {
+            "userId": res["userId"],
+            "collectionId": collection_id,
+            "title": res["title"],
+            "description": res["description"],
+            "color": res["color"],
+            "public": res["public"],
+            "createdAt": res["createdAt"],
+            "cards": read_cards_from_collection(collection_id)
+        }
     except:
         raise HTTPException(status_code=500)
 
-def update_collection(user_id: str, collection_id: str, title: str, description: str, color: Models.Color, public: bool):
+def update_collection(collection_id: str, title: str, description: str, color: Models.Color, public: bool):
     try:
-        collection = Models.Collection(
-            userId=user_id,
-            collectionId=collection_id,
-            title=title,
-            description=description,
-            color=color,
-            public=public,
-            createdAt=int(time.time())
+        collections_table.find_one_and_update(
+            {"collectionId": collection_id}, 
+            {
+                "$set": {
+                    "title": title,
+                    "description": description,
+                    "color": color,
+                    "public": public
+                }
+            }
         )
-        collections_table.find_one_and_update({"collectionId": collection_id}, collection.model_dump_json())
     except:
-        raise HTTPException(status_code=400)
+        raise HTTPException(status_code=500)
 
 def delete_collection(collection_id: str):
     try:
@@ -171,20 +186,29 @@ def delete_collection(collection_id: str):
     except:
         raise HTTPException(status_code=500)
 
-def create_card(collection_id: str, front: str, back: str, notes: str):
+def get_all_cards():
     try:
-        card_id = uuid.uuid4()
-        card = Models.Card(
-            collectionId=collection_id,
-            cardId=card_id,
-            front=front,
-            back=back,
-            notes=notes,
-            createdAt=int(time.time())
-        )
-        cards_table.insert_one(card.model_dump_json())
+        res = cards_table.find({}, {"_id": 0}).to_list()
+        return res
     except:
-        raise HTTPException(status_code=400)
+        raise HTTPException(status_code=500)
+
+def create_cards(cards: list[Models.PostCard]):
+    try:
+        for element in cards:
+            card_id = str(uuid.uuid4())
+            card = Models.Card(
+                collectionId=element.collectionId,
+                cardId=card_id,
+                front=element.front,
+                back=element.back,
+                notes=element.notes,
+                createdAt=int(time.time())
+            )
+            cards_table.insert_one(card.model_dump())
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500)
 
 def read_card(card_id: str):
     try:
@@ -200,17 +224,18 @@ def read_cards_from_collection(collection_id: str):
     except:
         raise HTTPException(status_code=500)
 
-def update_card(collection_id: str, card_id: str, front: str, back: str, notes: str):
+def update_card(card_id: str, front: str, back: str, notes: str):
     try:
-        card = Models.Card(
-            collectionId=collection_id,
-            cardId=card_id,
-            front=front,
-            back=back,
-            notes=notes,
-            createdAt=int(time.time())
+        cards_table.find_one_and_update(
+            {"cardId": card_id}, 
+            {
+                "$set": {
+                    "front": front,
+                    "back": back,
+                    "notes": notes
+                }
+            }
         )
-        cards_table.find_one_and_update({"cardId": card_id}, card.model_dump_json())
     except:
         raise HTTPException(status_code=400)
 

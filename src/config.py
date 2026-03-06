@@ -1,0 +1,4 @@
+
+WIPE_DATABASE_ON_RESTART: bool = True
+MONGO_HOST: str = "mongo"
+MONGO_PORT: int = 27017

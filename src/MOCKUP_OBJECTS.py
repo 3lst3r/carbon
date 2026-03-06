@@ -1,11 +1,10 @@
 import time
 import bcrypt
-import uuid
 from src import models as Models
 
-user_id = str(uuid.uuid4())
-collection_id = str(uuid.uuid4())
-card_id = str(uuid.uuid4())
+user_id = "example-userid-alice"
+collection_id = "example-collectionid-alice"
+card_id = "example-cardid-alice"
 user = Models.User(
     userId=user_id,
     name="Alice",

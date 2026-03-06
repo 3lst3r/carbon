@@ -50,3 +50,22 @@ class PutUser(BaseModel):
     name: str
     email: str
     password: str
+
+class PutCollection(BaseModel):
+    collectionId: str
+    title: str
+    description: str
+    color: Color
+    public: bool
+
+class PutCard(BaseModel):
+    cardId: str
+    front: str
+    back: str
+    notes: str
+
+class PostCard(BaseModel):
+    collectionId: str
+    front: str
+    back: str
+    notes: str

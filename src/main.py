@@ -4,7 +4,6 @@ from urllib.parse import unquote
 
 from src import models
 from src import MOCKUP
-from src import authentication
 from src import database
 
 app = FastAPI()
@@ -15,15 +14,15 @@ def startup_event():
     database.startup()
     return
 
-@app.get("/")
+@app.get("/", status_code=200)
 def root():
     return RedirectResponse(url="/docs")
 
-@app.get("/health")
+@app.get("/health", status_code=200)
 def health():
     return database.health()
 
-@app.get("/api/users")
+@app.get("/api/users", status_code=200)
 def get_users():
     return database.get_all_users()
 
@@ -31,7 +30,7 @@ def get_users():
 def get_user_by_email(email: str):
     return database.read_user_by_email(email=unquote(email))
 
-@app.get("/api/user/{name}")
+@app.get("/api/user/{name}", status_code=200)
 def get_user_by_name(name: str):
     return database.read_user_by_name(name=name)
 
@@ -43,63 +42,63 @@ async def post_user(user: models.PostUser):
 def put_user(user: models.PutUser):
     return database.update_user(user_id=user.userId, name=user.name, email=user.email, password=user.password)
 
-@app.delete("/api/user/{user_id}")
+@app.delete("/api/user/{user_id}", status_code=200)
 def delete_user(user_id: str):
     return database.delete_user(user_id)
 
-@app.get("/api/collections")
+@app.get("/api/collections", status_code=200)
 def get_collections():
-    return MOCKUP.GET_ALL_COLLECTIONS
+    return database.get_all_collections()
 
-@app.get("/api/collection/{collection_id}")
+@app.get("/api/collection/{collection_id}", status_code=200)
 def get_collection(collection_id: str):
     return database.read_collection(collection_id=collection_id)
 
-@app.put("/api/collection/{collection}")
-def put_collection(collection: str):
-    return MOCKUP.GET_PUT_COLLECTION
+@app.put("/api/collection", status_code=201)
+def put_collection(collection: models.PutCollection):
+    return database.update_collection(collection_id=collection.collectionId, title=collection.title, description=collection.description, color=collection.color, public=collection.public)
 
-@app.delete("/api/collection/{collection}")
-def delete_collection(collection: str):
-    return MOCKUP.DELETE_COLLECTION
+@app.delete("/api/collection/{collection_id}", status_code=200)
+def delete_collection(collection_id: str):
+    return database.delete_collection(collection_id=collection_id)
 
-@app.get("/api/cards")
+@app.get("/api/cards", status_code=200)
 def get_cards():
-    return MOCKUP.GET_ALL_CARDS
+    return database.get_all_cards()
 
-@app.get("/api/card/{card_id}")
+@app.get("/api/card/{card_id}", status_code=200)
 def get_card(card_id: str):
     return database.read_card(card_id=card_id)
 
-@app.put("/api/card/{card}")
-def put_card(card: str):
-    return MOCKUP.GET_PUT_CARD
+@app.put("/api/card", status_code=201)
+def put_card(card: models.PutCard):
+    return database.update_card(card_id=card.cardId, front=card.front, back=card.back, notes=card.notes)
 
-@app.post("/api/card/{card}")
-def post_cards(card: str):
-    return MOCKUP.POST_CARDS
+@app.post("/api/card", status_code=201)
+def post_cards(cards: list[models.PostCard]):
+    return database.create_cards(cards)
 
-@app.delete("/api/card/{card}")
-def delete_card(card: str):
-    return MOCKUP.DELETE_CARD
+@app.delete("/api/card/{card_id}", status_code=200)
+def delete_card(card_id: str):
+    return database.delete_card(card_id=card_id)
 
-@app.get("/api/categories")
+@app.get("/api/categories", status_code=200)
 def get_categories():
     return MOCKUP.GET_ALL_CATEGORIES
 
-@app.post("/api/signup")
+@app.post("/api/signup", status_code=201)
 def post_signup():
     return MOCKUP.POST_SIGNUP_LOGIN
 
-@app.post("/api/login")
+@app.post("/api/login", status_code=201)
 def post_login():
     return MOCKUP.POST_SIGNUP_LOGIN
 
-@app.post("/api/save/{collection}")
+@app.post("/api/save/{collection}", status_code=201)
 def post_save_collection(collection: str):
     return MOCKUP.POST_SAVE_COLLECTION
 
-@app.get("/api/saved/{user_id}")
+@app.get("/api/saved/{user_id}", status_code=200)
 def get_save_collection(user_id: str):
     return database.read_favorites(user_id=user_id)
 
