@@ -21,10 +21,21 @@ def startup():
         users_table.delete_many({})
         collections_table.delete_many({})
         cards_table.delete_many({})
-    if users_table.count_documents({}) == 0:
-        users_table.insert_one(Mockups.user.model_dump())
-        collections_table.insert_one(Mockups.collection.model_dump())
-        cards_table.insert_one(Mockups.card.model_dump())
+    if users_table.count_documents({}) == 0 and config.FILL_DATABASE_WITH_DEMO_DATA:
+        users_table.insert_one(Mockups.user_alice.model_dump())
+        users_table.insert_one(Mockups.user_bob.model_dump())
+        collections_table.insert_one(Mockups.collection_1.model_dump())
+        collections_table.insert_one(Mockups.collection_2.model_dump())
+        collections_table.insert_one(Mockups.collection_3.model_dump())
+        collections_table.insert_one(Mockups.collection_4.model_dump())
+        cards_table.insert_one(Mockups.card_1.model_dump())
+        cards_table.insert_one(Mockups.card_2.model_dump())
+        cards_table.insert_one(Mockups.card_3.model_dump())
+        cards_table.insert_one(Mockups.card_4.model_dump())
+        cards_table.insert_one(Mockups.card_5.model_dump())
+        cards_table.insert_one(Mockups.card_6.model_dump())
+        cards_table.insert_one(Mockups.card_7.model_dump())
+        cards_table.insert_one(Mockups.card_8.model_dump())
 
 def health():
     try:
