@@ -19,6 +19,10 @@ card_id_bob_2 = "example-cardid-bob-2"
 card_id_bob_3 = "example-cardid-bob-3"
 card_id_bob_4 = "example-cardid-bob-4"
 
+favorite_id_alice_1 = "example-favoriteid-alice-1"
+favorite_id_bob_1 = "example-favoriteid-bob-1"
+favorite_id_bob_2 = "example-favoriteid-bob-2"
+
 user_alice = Models.User(
     userId=user_id_alice,
     name="Alice",
@@ -133,5 +137,24 @@ card_8 = Models.Card(
     front="Test Front 8",
     back="Test Back 8",
     notes="Test Notes 8",
+    createdAt=int(time.time())
+)
+
+favorite_alice_1 = Models.Favorite(
+    userId=user_id_alice,
+    collectionId=collection_id_bob_1,
+    favoriteId=favorite_id_alice_1,
+    createdAt=int(time.time())
+)
+favorite_bob_1 = Models.Favorite(
+    userId=user_id_bob,
+    collectionId=collection_id_alice_1,
+    favoriteId=favorite_id_bob_1,
+    createdAt=int(time.time())
+)
+favorite_bob_2 = Models.Favorite(
+    userId=user_id_bob,
+    collectionId=collection_id_alice_2,
+    favoriteId=favorite_id_bob_2,
     createdAt=int(time.time())
 )

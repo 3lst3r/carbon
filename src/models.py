@@ -36,7 +36,7 @@ class Favorite(BaseModel):
     userId: str
     collectionId: str
     favoriteId: str
-    createdAt: str
+    createdAt: int
 
 
 
@@ -69,3 +69,7 @@ class PostCard(BaseModel):
     front: str
     back: str
     notes: str
+
+class PostFavorite(BaseModel):
+    userId: str
+    collectionId: str

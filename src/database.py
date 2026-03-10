@@ -21,6 +21,7 @@ def startup():
         users_table.delete_many({})
         collections_table.delete_many({})
         cards_table.delete_many({})
+        favorites_table.delete_many({})
     if users_table.count_documents({}) == 0 and config.FILL_DATABASE_WITH_DEMO_DATA:
         users_table.insert_one(Mockups.user_alice.model_dump())
         users_table.insert_one(Mockups.user_bob.model_dump())
@@ -36,6 +37,9 @@ def startup():
         cards_table.insert_one(Mockups.card_6.model_dump())
         cards_table.insert_one(Mockups.card_7.model_dump())
         cards_table.insert_one(Mockups.card_8.model_dump())
+        favorites_table.insert_one(Mockups.favorite_alice_1.model_dump())
+        favorites_table.insert_one(Mockups.favorite_bob_1.model_dump())
+        favorites_table.insert_one(Mockups.favorite_bob_2.model_dump())
 
 def health():
     try:
@@ -258,34 +262,30 @@ def delete_card(card_id: str):
 
 def create_favorite(user_id: str, collection_id: str):
     try:
-        favorite_id = uuid.uuid4()
-        favorite = Models.Favorite(
-            userId=user_id,
-            collection_id=collection_id,
-            favoriteId=favorite_id,
-            createdAt=int(time.time())
-        )
-        favorites_table.insert_one(favorite)
-    except:
-        raise HTTPException(status_code=400)
-    return
-
-def read_favorites(user_id: str):
-    try:
-        res = favorites_table.find({"userId": user_id}, {"_id": 0}).to_list()
-        return res
-    except:
-        raise HTTPException(status_code=500)
-
-def update_favorite(user_id: str, collection_id: str, favorite_id: str):
-    try:
+        favorite_id = str(uuid.uuid4())
         favorite = Models.Favorite(
             userId=user_id,
             collectionId=collection_id,
             favoriteId=favorite_id,
             createdAt=int(time.time())
         )
-        favorites_table.find_one_and_update({"favoriteId": favorite_id}, favorite)
+        favorites_table.insert_one(favorite.model_dump())
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=400)
+    return
+
+def get_all_favorites():
+    try:
+        res = favorites_table.find({}, {"_id": 0}).to_list()
+        return res
+    except:
+        raise HTTPException(status_code=500)
+
+def read_favorites(user_id: str):
+    try:
+        res = favorites_table.find({"userId": user_id}, {"_id": 0}).to_list()
+        return res
     except:
         raise HTTPException(status_code=500)
 

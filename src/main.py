@@ -94,13 +94,21 @@ def post_signup():
 def post_login():
     return MOCKUP.POST_SIGNUP_LOGIN
 
-@app.post("/api/save/{collection}", status_code=201)
-def post_save_collection(collection: str):
-    return MOCKUP.POST_SAVE_COLLECTION
+@app.post("/api/save", status_code=201)
+def post_save_collection(favorite: models.PostFavorite):
+    database.create_favorite(user_id=favorite.userId, collection_id=favorite.collectionId)
+
+@app.get("/api/saved", status_code=200)
+def get_save_collection():
+    return database.get_all_favorites()
 
 @app.get("/api/saved/{user_id}", status_code=200)
 def get_save_collection(user_id: str):
     return database.read_favorites(user_id=user_id)
+
+@app.delete("/api/saved/{favorite_id}", status_code=200)
+def get_save_collection(favorite_id: str):
+    return database.delete_favorite(favorite_id=favorite_id)
 
 
 # GET all users (locked)
