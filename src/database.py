@@ -294,3 +294,11 @@ def delete_favorite(favorite_id: str):
         favorites_table.find_one_and_delete({"favoriteId": favorite_id})
     except:
         raise HTTPException(status_code=500)
+
+
+
+def signup(name: str, email: str, password: str):
+    return
+
+def login(email: str, password: str):
+    return
