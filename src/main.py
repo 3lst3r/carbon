@@ -116,8 +116,8 @@ def delete_saved_collection(favorite_id: str):
 
 
 @app.post("/api/signup", status_code=201)
-async def signup(user: models.PostUser):
-    return database.signup(name=user.name, email=user.email, password=user.password)
+async def signup(user: models.PostUser, response: Response):
+    return database.signup(name=user.name, email=user.email, password=user.password, response=response)
 
 @app.post("/api/login", status_code=200)
 async def login(user: models.PostLogin, response: Response):
@@ -128,6 +128,6 @@ async def login(user: models.PostLogin, response: Response):
 async def login_oauth(form_data: OAuth2PasswordRequestForm = Depends()):
     return database.login(email=form_data.username, password=form_data.password)
 
-@app.get("/api/me", status_code=200)
+@app.get("/api/home", status_code=200)
 def read_current_user(current_user: dict = Depends(database.get_current_user)):
-    return current_user
+    return database.read_user_by_user_id(current_user["userId"])

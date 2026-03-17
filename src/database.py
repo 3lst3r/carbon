@@ -314,8 +314,9 @@ def create_access_token(data: dict):
     token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return token
 
-def signup(name: str, email: str, password: str):
-    return create_user(name=name, email=email, password=password)
+def signup(name: str, email: str, password: str, response: Response):
+    create_user(name=name, email=email, password=password)
+    return login(email=email, password=password, response=response)
 
 def login(email: str, password: str, response: Response):
     res = users_table.find_one({"email": email}, {"_id": 0})
@@ -348,9 +349,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             raise HTTPException(status_code=401, detail="Invalid token")
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
-
     user = users_table.find_one({"email": user_email}, {"_id": 0, "pass_hash": 0})
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
-
     return user
