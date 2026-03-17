@@ -2,7 +2,7 @@ import bcrypt
 import uuid
 import time
 
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from pymongo import MongoClient
 from src import models as Models
@@ -317,15 +317,28 @@ def create_access_token(data: dict):
 def signup(name: str, email: str, password: str):
     return create_user(name=name, email=email, password=password)
 
-def login(email: str, password: str):
+def login(email: str, password: str, response: Response):
     res = users_table.find_one({"email": email}, {"_id": 0})
     if not res:
-        return {"correct": False, "detail": "User not found"}
+        return {"msg": "credentials unmatching"}
     if bcrypt.checkpw(password.encode("utf-8"), res["pass_hash"]):
-        token = create_access_token(data={"sub": res["email"]})
-        return {"correct": True, "access_token": token, "token_type": "bearer"}
-    else:
-        return {"correct": False, "detail": "Incorrect password"}
+        token = create_access_token({
+            "sub": res["email"],
+            "userId": str(res["userId"])
+        })
+        response.set_cookie(
+            key="access_token",
+            value=token,
+            httponly=True,
+            secure=False,
+            samesite="lax"
+        )
+        return {
+            "name": res["name"],
+            "email": res["email"],
+            "userId": str(res["userId"])
+        }
+    return {"msg": "credentials unmatching"}
     
 def get_current_user(token: str = Depends(oauth2_scheme)):
     try:

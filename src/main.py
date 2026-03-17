@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Response
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
@@ -120,8 +120,8 @@ async def signup(user: models.PostUser):
     return database.signup(name=user.name, email=user.email, password=user.password)
 
 @app.post("/api/login", status_code=200)
-async def login(user: models.PostLogin):
-    return database.login(email=user.email, password=user.password)
+async def login(user: models.PostLogin, response: Response):
+    return database.login(email=user.email, password=user.password, response=response)
 
 
 @app.post("/api/token", status_code=200)
