@@ -305,7 +305,7 @@ from datetime import datetime, timedelta
 SECRET_KEY = "SUPER_SECRET_KEY_CHANGE_THIS"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login", auto_error=False)
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -349,7 +349,7 @@ def logout(response: Response):
         samesite="lax"
     )
     return {"msg": "logged out"}
-    
+
 def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -361,4 +361,21 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     user = users_table.find_one({"email": user_email}, {"_id": 0, "pass_hash": 0})
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
+    return user
+
+def get_current_user_optional(token: str = Depends(oauth2_scheme)):
+    if token is None:
+        return False
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_email = payload.get("sub")
+        if user_email is None:
+            return False
+    except JWTError:
+        return False
+
+    user = users_table.find_one({"email": user_email}, {"_id": 0, "pass_hash": 0, "createdAt": 0})
+    if user is None:
+        return False
+
     return user

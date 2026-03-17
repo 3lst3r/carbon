@@ -119,7 +119,11 @@ def delete_saved_collection(favorite_id: str):
 async def signup(user: models.PostUser, response: Response):
     return database.signup(name=user.name, email=user.email, password=user.password, response=response)
 
-@app.post("/api/login", status_code=200)
+@app.get("/api/login", status_code=200)
+def get_login_info(current_user = Depends(database.get_current_user_optional)):
+    return current_user
+
+@app.post("/api/login", status_code=201)
 async def login(user: models.PostLogin, response: Response):
     return database.login(email=user.email, password=user.password, response=response)
 
