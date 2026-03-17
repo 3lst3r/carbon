@@ -1,10 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordRequestForm
 from urllib.parse import unquote
 
 from src import models
-from src import MOCKUP
 from src import database
 
 app = FastAPI()
@@ -47,10 +47,6 @@ def get_user_by_email(email: str):
 @app.get("/api/user/{name}", status_code=200)
 def get_user_by_name(name: str):
     return database.read_user_by_name(name=name)
-
-@app.post("/api/user", status_code=201)
-async def post_user(user: models.PostUser):
-    return database.create_user(name=user.name, email=user.email, password=user.password)
 
 @app.put("/api/user", status_code=201)
 def put_user(user: models.PutUser):
@@ -100,18 +96,6 @@ def post_cards(cards: list[models.PostCard]):
 def delete_card(card_id: str):
     return database.delete_card(card_id=card_id)
 
-@app.get("/api/categories", status_code=200)
-def get_categories():
-    return MOCKUP.GET_ALL_CATEGORIES
-
-@app.post("/api/signup", status_code=201)
-def post_signup():
-    return MOCKUP.POST_SIGNUP_LOGIN
-
-@app.post("/api/login", status_code=201)
-def post_login():
-    return MOCKUP.POST_SIGNUP_LOGIN
-
 @app.post("/api/save", status_code=201)
 def post_save_collection(favorite: models.PostFavorite):
     database.create_favorite(user_id=favorite.userId, collection_id=favorite.collectionId)
@@ -127,3 +111,23 @@ def get_saved_collection(user_id: str):
 @app.delete("/api/saved/{favorite_id}", status_code=200)
 def delete_saved_collection(favorite_id: str):
     return database.delete_favorite(favorite_id=favorite_id)
+
+
+
+
+@app.post("/api/signup", status_code=201)
+async def signup(user: models.PostUser):
+    return database.signup(name=user.name, email=user.email, password=user.password)
+
+@app.post("/api/login", status_code=200)
+async def login(user: models.PostLogin):
+    return database.login(email=user.email, password=user.password)
+
+
+@app.post("/api/token", status_code=200)
+async def login_oauth(form_data: OAuth2PasswordRequestForm = Depends()):
+    return database.login(email=form_data.username, password=form_data.password)
+
+@app.get("/api/me", status_code=200)
+def read_current_user(current_user: dict = Depends(database.get_current_user)):
+    return current_user

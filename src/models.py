@@ -73,3 +73,7 @@ class PostCard(BaseModel):
 class PostFavorite(BaseModel):
     userId: str
     collectionId: str
+
+class PostLogin(BaseModel):
+    email: str
+    password: str

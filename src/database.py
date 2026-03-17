@@ -2,7 +2,8 @@ import bcrypt
 import uuid
 import time
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from pymongo import MongoClient
 from src import models as Models
 from src import MOCKUP_OBJECTS as Mockups
@@ -296,9 +297,47 @@ def delete_favorite(favorite_id: str):
         raise HTTPException(status_code=500)
 
 
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+from jose import jwt, JWTError
+from datetime import datetime, timedelta
+
+SECRET_KEY = "SUPER_SECRET_KEY_CHANGE_THIS"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return token
 
 def signup(name: str, email: str, password: str):
-    return
+    return create_user(name=name, email=email, password=password)
 
 def login(email: str, password: str):
-    return
+    res = users_table.find_one({"email": email}, {"_id": 0})
+    if not res:
+        return {"correct": False, "detail": "User not found"}
+    if bcrypt.checkpw(password.encode("utf-8"), res["pass_hash"]):
+        token = create_access_token(data={"sub": res["email"]})
+        return {"correct": True, "access_token": token, "token_type": "bearer"}
+    else:
+        return {"correct": False, "detail": "Incorrect password"}
+    
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_email = payload.get("sub")
+        if user_email is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    user = users_table.find_one({"email": user_email}, {"_id": 0})
+    if user is None:
+        raise HTTPException(status_code=401, detail="User not found")
+
+    return user
