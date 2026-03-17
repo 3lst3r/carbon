@@ -12,7 +12,6 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"]
 )
@@ -60,7 +59,7 @@ def get_collections():
     return database.get_all_collections()
 
 @app.get("/api/collections/popular", status_code=200)
-def get_collections():
+def get_popular_collections():
     return database.get_all_collections()[:5]
 
 @app.get("/api/collection/{collection_id}", status_code=200)
@@ -112,45 +111,13 @@ def post_save_collection(favorite: models.PostFavorite):
     database.create_favorite(user_id=favorite.userId, collection_id=favorite.collectionId)
 
 @app.get("/api/saved", status_code=200)
-def get_save_collection():
+def get_all_saved_collections():
     return database.get_all_favorites()
 
 @app.get("/api/saved/{user_id}", status_code=200)
-def get_save_collection(user_id: str):
+def get_saved_collection(user_id: str):
     return database.read_favorites(user_id=user_id)
 
 @app.delete("/api/saved/{favorite_id}", status_code=200)
-def get_save_collection(favorite_id: str):
+def delete_saved_collection(favorite_id: str):
     return database.delete_favorite(favorite_id=favorite_id)
-
-
-# GET all users (locked)
-# GET user by name
-# GET user by user_id
-# POST user
-# PUT user
-# DELETE user
-
-# GET all collections (locked)
-# GET collection by collection_id
-# POST collection by user_id
-# PUT collection by collection_id
-# DELETE collection by collection_id
-
-# GET all cards (locked)
-# GET card by card_id
-# POST card by collection_id
-# PUT card by card_id
-# DELETE card by card_id
-
-# GET all categories
-
-# POST signup
-# POST login
-# DELETE login
-
-# GET health
-# startup
-
-# POST save collection?
-# GET all saved collections?
