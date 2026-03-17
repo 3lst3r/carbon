@@ -50,6 +50,10 @@ def delete_user(user_id: str):
 def get_collections():
     return database.get_all_collections()
 
+@app.get("/api/collections/popular", status_code=200)
+def get_collections():
+    return database.get_all_collections()[:5]
+
 @app.get("/api/collection/{collection_id}", status_code=200)
 def get_collection(collection_id: str):
     return database.read_collection(collection_id=collection_id)
