@@ -336,7 +336,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-    user = users_table.find_one({"email": user_email}, {"_id": 0})
+    user = users_table.find_one({"email": user_email}, {"_id": 0, "pass_hash": 0})
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
 
