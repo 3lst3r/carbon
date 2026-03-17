@@ -123,6 +123,9 @@ async def signup(user: models.PostUser, response: Response):
 async def login(user: models.PostLogin, response: Response):
     return database.login(email=user.email, password=user.password, response=response)
 
+@app.post("/api/logout", status_code=201)
+async def logout(response: Response):
+    return database.logout(response=response)
 
 @app.post("/api/token", status_code=200)
 async def login_oauth(form_data: OAuth2PasswordRequestForm = Depends()):

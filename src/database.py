@@ -340,6 +340,15 @@ def login(email: str, password: str, response: Response):
             "userId": str(res["userId"])
         }
     return {"msg": "credentials unmatching"}
+
+def logout(response: Response):
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=False,
+        samesite="lax"
+    )
+    return {"msg": "logged out"}
     
 def get_current_user(token: str = Depends(oauth2_scheme)):
     try:
