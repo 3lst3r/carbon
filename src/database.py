@@ -383,12 +383,12 @@ def get_current_user_optional(token: str = Depends(oauth2_scheme)):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_email = payload.get("sub")
         if user_email is None:
-            return {"msg": "token contains no field 'email'"}
+            raise HTTPException(status_code=500, detail="token contains no field 'email'")
     except JWTError:
-        return {"msg": "a JWTError occured"}
+        raise HTTPException(status_code=500, detail="a JWTError occured")
 
     user = users_table.find_one({"email": user_email}, {"_id": 0, "pass_hash": 0, "createdAt": 0})
     if user is None:
-        return {"msg": "user not found in database"}
+        raise HTTPException(status_code=500, detail="user not found in database")
 
     return user
