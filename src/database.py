@@ -98,6 +98,18 @@ def read_user_by_user_id(user_id: str):
     except:
         raise HTTPException(status_code=500)
 
+def read_user_by_user_id_raw(user_id: str):
+    try:
+        res = users_table.find_one({"userId": user_id}, {"_id": 0})
+        return {
+            "userId": res["userId"],
+            "name": res["name"],
+            "email": res["email"],
+            "createdAt": res["createdAt"]
+        }
+    except:
+        raise HTTPException(status_code=500)
+
 def read_user_by_name(name: str):
     try:
         res = users_table.find_one({"name": name}, {"_id": 0, "pass_hash": 0})
@@ -168,7 +180,7 @@ def read_collection(collection_id: str):
     try:
         res = collections_table.find_one({"collectionId": collection_id}, {"_id": 0})
         return {
-            "userId": res["userId"],
+            "user": read_user_by_user_id_raw(res["userId"]),
             "collectionId": collection_id,
             "title": res["title"],
             "description": res["description"],
@@ -177,7 +189,8 @@ def read_collection(collection_id: str):
             "createdAt": res["createdAt"],
             "cards": read_cards_from_collection(collection_id)
         }
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500)
 
 def update_collection(collection_id: str, title: str, description: str, color: Models.Color, public: bool):
