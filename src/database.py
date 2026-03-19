@@ -9,6 +9,11 @@ from src import models as Models
 from src import MOCKUP_OBJECTS as Mockups
 from src import config
 
+from fastapi import Depends
+from fastapi.security import OAuth2PasswordBearer
+from jose import jwt, JWTError
+from datetime import datetime, timedelta
+
 client = MongoClient(f"mongodb://{config.MONGO_HOST}:{config.MONGO_PORT}")
 db = client["carbon_db"]
 users_table = db["users"]
@@ -16,6 +21,10 @@ collections_table = db["collections"]
 cards_table = db["cards"]
 favorites_table = db["favorites"]
 
+SECRET_KEY = "SUPER_SECRET_KEY_CHANGE_THIS"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login", auto_error=False)
 
 def startup():
     if config.WIPE_DATABASE_ON_RESTART:
@@ -51,9 +60,10 @@ def health():
 
 def get_all_users():
     try:
-        res = users_table.find({}, {"_id": 0, "pass_hash": 0}).to_list()
+        res = list(users_table.find({}, {"_id": 0, "pass_hash": 0}))
         return res
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500)
 
 def create_user(name: str, email: str, password: str):
@@ -147,14 +157,14 @@ def delete_user(user_id: str):
 
 def get_all_collections():
     try:
-        res = collections_table.find({}, {"_id": 0}).to_list()
+        res = list(collections_table.find({}, {"_id": 0}))
         return res
     except:
         raise HTTPException(status_code=500)
 
 def get_collections_from_user_id(user_id: str):
     try:
-        res = collections_table.find({"userId": user_id}, {"_id": 0}).to_list()
+        res = list(collections_table.find({"userId": user_id}, {"_id": 0}))
         return res
     except Exception as e:
         print(e)
@@ -217,7 +227,7 @@ def delete_collection(collection_id: str):
 
 def get_all_cards():
     try:
-        res = cards_table.find({}, {"_id": 0}).to_list()
+        res = list(cards_table.find({}, {"_id": 0}))
         return res
     except:
         raise HTTPException(status_code=500)
@@ -248,7 +258,7 @@ def read_card(card_id: str):
 
 def read_cards_from_collection(collection_id: str):
     try:
-        res = cards_table.find({"collectionId": collection_id}, {"_id": 0}).to_list()
+        res = list(cards_table.find({"collectionId": collection_id}, {"_id": 0}))
         return res
     except:
         raise HTTPException(status_code=500)
@@ -291,14 +301,14 @@ def create_favorite(user_id: str, collection_id: str):
 
 def get_all_favorites():
     try:
-        res = favorites_table.find({}, {"_id": 0}).to_list()
+        res = list(favorites_table.find({}, {"_id": 0}))
         return res
     except:
         raise HTTPException(status_code=500)
 
 def read_favorites(user_id: str):
     try:
-        res = favorites_table.find({"userId": user_id}, {"_id": 0}).to_list()
+        res = list(favorites_table.find({"userId": user_id}, {"_id": 0}))
         return res
     except:
         raise HTTPException(status_code=500)
@@ -310,15 +320,6 @@ def delete_favorite(favorite_id: str):
         raise HTTPException(status_code=500)
 
 
-from fastapi import Depends
-from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
-from datetime import datetime, timedelta
-
-SECRET_KEY = "SUPER_SECRET_KEY_CHANGE_THIS"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login", auto_error=False)
 
 def create_access_token(data: dict):
     to_encode = data.copy()

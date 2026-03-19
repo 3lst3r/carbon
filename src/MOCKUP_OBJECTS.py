@@ -23,19 +23,21 @@ favorite_id_alice_1 = "example-favoriteid-alice-1"
 favorite_id_bob_1 = "example-favoriteid-bob-1"
 favorite_id_bob_2 = "example-favoriteid-bob-2"
 
+creation_time = int(time.time())
+
 user_alice = Models.User(
     userId=user_id_alice,
     name="Alice",
     email="alice@example.com",
     pass_hash=bcrypt.hashpw(bytes(b"alice123"), bcrypt.gensalt()),
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 user_bob = Models.User(
     userId=user_id_bob,
     name="Bob",
     email="bob@example.com",
     pass_hash=bcrypt.hashpw(bytes(b"bob123"), bcrypt.gensalt()),
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 
 collection_1 = Models.Collection(
@@ -45,7 +47,7 @@ collection_1 = Models.Collection(
     description="Test Description 1",
     color="red",
     public=True,
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 collection_2 = Models.Collection(
     userId=user_id_alice,
@@ -54,7 +56,7 @@ collection_2 = Models.Collection(
     description="Test Description 2",
     color="green",
     public=False,
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 collection_3 = Models.Collection(
     userId=user_id_bob,
@@ -63,7 +65,7 @@ collection_3 = Models.Collection(
     description="Test Description 3",
     color="blue",
     public=True,
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 collection_4 = Models.Collection(
     userId=user_id_bob,
@@ -72,7 +74,7 @@ collection_4 = Models.Collection(
     description="Test Description 4",
     color="orange",
     public=False,
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 
 card_1 = Models.Card(
@@ -81,7 +83,7 @@ card_1 = Models.Card(
     front="Test Front 1",
     back="Test Back 1",
     notes="Test Notes 1",
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 card_2 = Models.Card(
     collectionId=collection_id_alice_1,
@@ -89,7 +91,7 @@ card_2 = Models.Card(
     front="Test Front 2",
     back="Test Back 2",
     notes="Test Notes 2",
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 card_3 = Models.Card(
     collectionId=collection_id_alice_2,
@@ -97,7 +99,7 @@ card_3 = Models.Card(
     front="Test Front 3",
     back="Test Back 3",
     notes="Test Notes 3",
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 card_4 = Models.Card(
     collectionId=collection_id_alice_2,
@@ -105,7 +107,7 @@ card_4 = Models.Card(
     front="Test Front 4",
     back="Test Back 4",
     notes="Test Notes 4",
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 card_5 = Models.Card(
     collectionId=collection_id_bob_1,
@@ -113,7 +115,7 @@ card_5 = Models.Card(
     front="Test Front 5",
     back="Test Back 5",
     notes="Test Notes 5",
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 card_6 = Models.Card(
     collectionId=collection_id_bob_1,
@@ -121,7 +123,7 @@ card_6 = Models.Card(
     front="Test Front 6",
     back="Test Back 6",
     notes="Test Notes 6",
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 card_7 = Models.Card(
     collectionId=collection_id_bob_2,
@@ -129,7 +131,7 @@ card_7 = Models.Card(
     front="Test Front 7",
     back="Test Back 7",
     notes="Test Notes 7",
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 card_8 = Models.Card(
     collectionId=collection_id_bob_2,
@@ -137,24 +139,24 @@ card_8 = Models.Card(
     front="Test Front 8",
     back="Test Back 8",
     notes="Test Notes 8",
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 
 favorite_alice_1 = Models.Favorite(
     userId=user_id_alice,
     collectionId=collection_id_bob_1,
     favoriteId=favorite_id_alice_1,
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 favorite_bob_1 = Models.Favorite(
     userId=user_id_bob,
     collectionId=collection_id_alice_1,
     favoriteId=favorite_id_bob_1,
-    createdAt=int(time.time())
+    createdAt=creation_time
 )
 favorite_bob_2 = Models.Favorite(
     userId=user_id_bob,
     collectionId=collection_id_alice_2,
     favoriteId=favorite_id_bob_2,
-    createdAt=int(time.time())
+    createdAt=creation_time
 )

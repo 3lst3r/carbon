@@ -3,11 +3,17 @@ from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from urllib.parse import unquote
+from contextlib import asynccontextmanager
 
 from src import models
 from src import database
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    database.startup()
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 origins = [
     "http://localhost:5173",
@@ -21,12 +27,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
-
-
-@app.on_event("startup")
-def startup_event():
-    database.startup()
-    return
 
 @app.get("/", status_code=200)
 def root():

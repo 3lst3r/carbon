@@ -5,3 +5,7 @@ FastAPI Backend for an Anki-like learning card application
 1. install and start Docker (Docker Desktop on Windows)
 2. `docker compose up --build`
 3. available on `localhost:8000`
+
+## Testing
+1. `pip install -r requirements.txt`
+2. `pytest tests`
