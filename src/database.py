@@ -59,6 +59,14 @@ def startup():
 def initialize_categories():
     categories_table.insert_one(Mockups.category_1.model_dump())
     categories_table.insert_one(Mockups.category_2.model_dump())
+    categories_table.insert_one(Mockups.category_3.model_dump())
+    categories_table.insert_one(Mockups.category_4.model_dump())
+    categories_table.insert_one(Mockups.category_5.model_dump())
+    categories_table.insert_one(Mockups.category_6.model_dump())
+    categories_table.insert_one(Mockups.category_7.model_dump())
+    categories_table.insert_one(Mockups.category_8.model_dump())
+    categories_table.insert_one(Mockups.category_9.model_dump())
+    categories_table.insert_one(Mockups.category_10.model_dump())
 
 def health():
     try:
