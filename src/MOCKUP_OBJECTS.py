@@ -40,6 +40,15 @@ user_bob = Models.User(
     createdAt=creation_time
 )
 
+category_1 = Models.Category(
+    label="MATHEMATIK",
+    value="Mathematik"
+)
+category_2 = Models.Category(
+    label="DEUTSCH",
+    value="Deutsch"
+)
+
 collection_1 = Models.Collection(
     userId=user_id_alice,
     collectionId=collection_id_alice_1,
@@ -47,7 +56,10 @@ collection_1 = Models.Collection(
     description="Test Description 1",
     color="red",
     public=True,
-    createdAt=creation_time
+    createdAt=creation_time,
+    categories=[
+        category_1
+    ]
 )
 collection_2 = Models.Collection(
     userId=user_id_alice,
@@ -56,7 +68,10 @@ collection_2 = Models.Collection(
     description="Test Description 2",
     color="green",
     public=False,
-    createdAt=creation_time
+    createdAt=creation_time,
+    categories=[
+        category_2
+    ]
 )
 collection_3 = Models.Collection(
     userId=user_id_bob,
@@ -65,7 +80,11 @@ collection_3 = Models.Collection(
     description="Test Description 3",
     color="blue",
     public=True,
-    createdAt=creation_time
+    createdAt=creation_time,
+    categories=[
+        category_1,
+        category_2
+    ]
 )
 collection_4 = Models.Collection(
     userId=user_id_bob,
@@ -74,7 +93,8 @@ collection_4 = Models.Collection(
     description="Test Description 4",
     color="orange",
     public=False,
-    createdAt=creation_time
+    createdAt=creation_time,
+    categories=[]
 )
 
 card_1 = Models.Card(

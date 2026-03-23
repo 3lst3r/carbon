@@ -74,7 +74,7 @@ def get_collection(collection_id: str):
 
 @app.put("/api/collection", status_code=201)
 def put_collection(collection: models.PutCollection):
-    return database.update_collection(collection_id=collection.collectionId, title=collection.title, description=collection.description, color=collection.color, public=collection.public)
+    return database.update_collection(collection_id=collection.collectionId, title=collection.title, description=collection.description, color=collection.color, public=collection.public, categories=collection.categories)
 
 @app.delete("/api/collection/{collection_id}", status_code=200)
 def delete_collection(collection_id: str):
@@ -116,6 +116,9 @@ def get_saved_collection(user_id: str):
 def delete_saved_collection(favorite_id: str):
     return database.delete_favorite(favorite_id=favorite_id)
 
+@app.get("/api/categories", status_code=200)
+def get_all_categories():
+    return database.get_all_categories()
 
 
 

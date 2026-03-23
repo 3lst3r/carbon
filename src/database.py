@@ -20,6 +20,7 @@ users_table = db["users"]
 collections_table = db["collections"]
 cards_table = db["cards"]
 favorites_table = db["favorites"]
+categories_table = db["categories"]
 
 SECRET_KEY = "SUPER_SECRET_KEY_CHANGE_THIS"
 ALGORITHM = "HS256"
@@ -27,11 +28,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login", auto_error=False)
 
 def startup():
+    if categories_table.count_documents({}) == 0:
+        initialize_categories()
     if config.WIPE_DATABASE_ON_RESTART:
         users_table.delete_many({})
         collections_table.delete_many({})
         cards_table.delete_many({})
         favorites_table.delete_many({})
+        categories_table.delete_many({})
+        initialize_categories()
     if users_table.count_documents({}) == 0 and config.FILL_DATABASE_WITH_DEMO_DATA:
         users_table.insert_one(Mockups.user_alice.model_dump())
         users_table.insert_one(Mockups.user_bob.model_dump())
@@ -50,6 +55,10 @@ def startup():
         favorites_table.insert_one(Mockups.favorite_alice_1.model_dump())
         favorites_table.insert_one(Mockups.favorite_bob_1.model_dump())
         favorites_table.insert_one(Mockups.favorite_bob_2.model_dump())
+
+def initialize_categories():
+    categories_table.insert_one(Mockups.category_1.model_dump())
+    categories_table.insert_one(Mockups.category_2.model_dump())
 
 def health():
     try:
@@ -170,7 +179,7 @@ def get_collections_from_user_id(user_id: str):
         print(e)
         raise HTTPException(status_code=500)
 
-def create_collection(user_id: str, title: str, description: str, color: Models.Color, public: bool):
+def create_collection(user_id: str, title: str, description: str, color: Models.Color, public: bool, categories: list[Models.Category]):
     try:
         collection_id = uuid.uuid4()
         collection = Models.Collection(
@@ -180,7 +189,8 @@ def create_collection(user_id: str, title: str, description: str, color: Models.
             description=description,
             color=color,
             public=public,
-            createdAt=int(time.time())
+            createdAt=int(time.time()),
+            categories=categories
         )
         collections_table.insert_one(collection.model_dump_json())
     except:
@@ -197,14 +207,21 @@ def read_collection(collection_id: str):
             "color": res["color"],
             "public": res["public"],
             "createdAt": res["createdAt"],
+            "categories": res["categories"],
             "cards": read_cards_from_collection(collection_id)
         }
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500)
 
-def update_collection(collection_id: str, title: str, description: str, color: Models.Color, public: bool):
+def update_collection(collection_id: str, title: str, description: str, color: Models.Color, public: bool, categories: list[Models.Category]):
     try:
+        temp = []
+        for element in categories:
+            temp.append({
+                "label": element.label,
+                "value": element.value
+            })
         collections_table.find_one_and_update(
             {"collectionId": collection_id}, 
             {
@@ -212,11 +229,13 @@ def update_collection(collection_id: str, title: str, description: str, color: M
                     "title": title,
                     "description": description,
                     "color": color,
-                    "public": public
+                    "public": public,
+                    "categories": temp
                 }
             }
         )
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500)
 
 def delete_collection(collection_id: str):
@@ -316,6 +335,13 @@ def read_favorites(user_id: str):
 def delete_favorite(favorite_id: str):
     try:
         favorites_table.find_one_and_delete({"favoriteId": favorite_id})
+    except:
+        raise HTTPException(status_code=500)
+
+def get_all_categories():
+    try:
+        res = list(categories_table.find({}, {"_id": 0}))
+        return res
     except:
         raise HTTPException(status_code=500)
 

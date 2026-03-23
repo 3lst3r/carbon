@@ -8,6 +8,10 @@ class Color(str, Enum):
     orange = "orange"
     purple = "purple"
 
+class Category(BaseModel):
+    label: str
+    value: str
+
 class User(BaseModel):
     userId: str
     name: str
@@ -23,6 +27,7 @@ class Collection(BaseModel):
     color: Color
     public: bool
     createdAt: int
+    categories: list[Category]
 
 class Card(BaseModel):
     collectionId: str
@@ -57,6 +62,7 @@ class PutCollection(BaseModel):
     description: str
     color: Color
     public: bool
+    categories: list[Category]
 
 class PutCard(BaseModel):
     cardId: str
@@ -78,6 +84,3 @@ class PostLogin(BaseModel):
     email: str
     password: str
 
-class Category(BaseModel):
-    label: str
-    value: str
