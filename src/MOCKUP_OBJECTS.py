@@ -48,6 +48,38 @@ category_2 = Models.Category(
     label="DEUTSCH",
     value="Deutsch"
 )
+category_3 = Models.Category(
+    label="ENGLISCH",
+    value="Englisch"
+)
+category_4 = Models.Category(
+    label="PHYSIK",
+    value="Physik"
+)
+category_5 = Models.Category(
+    label="BIOLOGIE",
+    value="Biologie"
+)
+category_6 = Models.Category(
+    label="CHEMIE",
+    value="Chemie"
+)
+category_7 = Models.Category(
+    label="INFORMATIK",
+    value="Informatik"
+)
+category_8 = Models.Category(
+    label="SPORT",
+    value="Sport"
+)
+category_9 = Models.Category(
+    label="SPANISCH",
+    value="Spanisch"
+)
+category_10 = Models.Category(
+    label="LATEIN",
+    value="Latein"
+)
 
 collection_1 = Models.Collection(
     userId=user_id_alice,
