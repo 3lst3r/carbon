@@ -121,6 +121,10 @@ def delete_saved_collection(favorite_id: str):
 def get_all_categories():
     return database.get_all_categories()
 
+@app.post("/api/collection", status_code=201)
+def post_collection():
+    return
+
 
 
 @app.post("/api/signup", status_code=201)
