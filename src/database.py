@@ -175,14 +175,40 @@ def delete_user(user_id: str):
 def get_all_collections():
     try:
         res = list(collections_table.find({}, {"_id": 0}))
-        return res
+        temp = []
+        for element in res:
+            temp.append({
+            "user": read_user_by_user_id_raw(element["userId"]),
+            "collectionId": element["collectionId"],
+            "title": element["title"],
+            "description": element["description"],
+            "color": element["color"],
+            "public": element["public"],
+            "createdAt": element["createdAt"],
+            "categories": element["categories"],
+            "cards": read_cards_from_collection(element["collectionId"])
+        })
+        return temp
     except:
         raise HTTPException(status_code=500)
 
 def get_collections_from_user_id(user_id: str):
     try:
         res = list(collections_table.find({"userId": user_id}, {"_id": 0}))
-        return res
+        temp = []
+        for element in res:
+            temp.append({
+            "user": read_user_by_user_id_raw(element["userId"]),
+            "collectionId": element["collectionId"],
+            "title": element["title"],
+            "description": element["description"],
+            "color": element["color"],
+            "public": element["public"],
+            "createdAt": element["createdAt"],
+            "categories": element["categories"],
+            "cards": read_cards_from_collection(element["collectionId"])
+        })
+        return temp
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500)
