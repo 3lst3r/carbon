@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional
 from enum import Enum
 
 class Color(str, Enum):
@@ -55,6 +56,14 @@ class PutUser(BaseModel):
     name: str
     email: str
     password: str
+
+class PostCollection(BaseModel):
+    userId: str
+    title: str
+    description: str = ""
+    color: Color = "blue"
+    public: bool = False
+    categories: list[Category] = Field(default_factory=list)
 
 class PutCollection(BaseModel):
     collectionId: str

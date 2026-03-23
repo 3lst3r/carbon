@@ -215,7 +215,7 @@ def get_collections_from_user_id(user_id: str):
 
 def create_collection(user_id: str, title: str, description: str, color: Models.Color, public: bool, categories: list[Models.Category]):
     try:
-        collection_id = uuid.uuid4()
+        collection_id = str(uuid.uuid4())
         collection = Models.Collection(
             userId=user_id,
             collectionId=collection_id,
@@ -226,8 +226,10 @@ def create_collection(user_id: str, title: str, description: str, color: Models.
             createdAt=int(time.time()),
             categories=categories
         )
-        collections_table.insert_one(collection.model_dump_json())
-    except:
+        collections_table.insert_one(collection.model_dump())
+        return read_collection(collection_id=collection_id)
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=400)
 
 def read_collection(collection_id: str):

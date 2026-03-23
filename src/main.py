@@ -122,8 +122,15 @@ def get_all_categories():
     return database.get_all_categories()
 
 @app.post("/api/collection", status_code=201)
-def post_collection():
-    return
+def post_collection(collection: models.PostCollection):
+    return database.create_collection(
+        user_id=collection.userId,
+        title=collection.title,
+        description=collection.description,
+        color=collection.color,
+        public=collection.public,
+        categories=collection.categories
+    )
 
 
 
