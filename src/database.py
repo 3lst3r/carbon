@@ -97,7 +97,7 @@ def read_user_by_email(email: str):
 
 def read_user_by_user_id(user_id: str):
     try:
-        res = users_table.find_one({"userId": user_id}, {"_id": 0})
+        res = users_table.find_one({"userId": user_id}, {"_id": 0, "pass_hash": 0})
         return {
             "userId": res["userId"],
             "name": res["name"],

@@ -44,7 +44,11 @@ def get_users():
 def get_user_by_email(email: str):
     return database.read_user_by_email(email=unquote(email))
 
-@app.get("/api/user/{name}", status_code=200)
+@app.get("/api/user/{userId}", status_code=200)
+def get_user_by_user_id(userId: str):
+    return database.read_user_by_user_id(user_id=userId)
+
+@app.get("/api/user_by_name/{name}", status_code=200)
 def get_user_by_name(name: str):
     return database.read_user_by_name(name=name)
 

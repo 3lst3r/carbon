@@ -77,3 +77,7 @@ class PostFavorite(BaseModel):
 class PostLogin(BaseModel):
     email: str
     password: str
+
+class Category(BaseModel):
+    label: str
+    value: str
