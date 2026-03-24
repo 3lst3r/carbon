@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, Response
+from fastapi import FastAPI, Depends, Response, Query
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
@@ -94,7 +94,7 @@ def put_card(card: models.PutCard):
     return database.update_card(card_id=card.cardId, front=card.front, back=card.back, notes=card.notes)
 
 @app.post("/api/card", status_code=201)
-def post_cards(cards: list[models.PostCard]):
+def post_cards(cards: models.PostCards):
     return database.create_cards(cards)
 
 @app.delete("/api/card/{card_id}", status_code=200)
@@ -131,6 +131,14 @@ def post_collection(collection: models.PostCollection):
         public=collection.public,
         categories=collection.categories
     )
+
+@app.get("/api/search")
+def search_collection(query: str = Query(...)):
+    return database.get_collections_from_query(query=query)
+
+@app.get("/api/collection_by_category/{category}")
+def search_collection(category: str):
+    return database.get_collections_from_category(category=category)
 
 
 

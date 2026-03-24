@@ -169,7 +169,8 @@ def update_user(user_id: str, name: str, email: str, password: str):
 def delete_user(user_id: str):
     try:
         users_table.find_one_and_delete({"userId": user_id})
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500)
 
 def get_all_collections():
@@ -189,7 +190,50 @@ def get_all_collections():
             "cards": read_cards_from_collection(element["collectionId"])
         })
         return temp
-    except:
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500)
+
+def get_collections_from_query(query: str):
+    try:
+        res = list(collections_table.find({"title": {"$regex": query}}, {"_id": 0}))
+        temp = []
+        for element in res:
+            temp.append({
+            "user": read_user_by_user_id_raw(element["userId"]),
+            "collectionId": element["collectionId"],
+            "title": element["title"],
+            "description": element["description"],
+            "color": element["color"],
+            "public": element["public"],
+            "createdAt": element["createdAt"],
+            "categories": element["categories"],
+            "cards": read_cards_from_collection(element["collectionId"])
+        })
+        return temp
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500)
+
+def get_collections_from_category(category: str):
+    try:
+        res = list(collections_table.find({"categories.label": {"$regex": category, "$options": "i"}}, {"_id": 0}))
+        temp = []
+        for element in res:
+            temp.append({
+            "user": read_user_by_user_id_raw(element["userId"]),
+            "collectionId": element["collectionId"],
+            "title": element["title"],
+            "description": element["description"],
+            "color": element["color"],
+            "public": element["public"],
+            "createdAt": element["createdAt"],
+            "categories": element["categories"],
+            "cards": read_cards_from_collection(element["collectionId"])
+        })
+        return temp
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=500)
 
 def get_collections_from_user_id(user_id: str):
@@ -287,12 +331,12 @@ def get_all_cards():
     except:
         raise HTTPException(status_code=500)
 
-def create_cards(cards: list[Models.PostCard]):
+def create_cards(cards: Models.PostCards):
     try:
-        for element in cards:
+        for element in cards.cards:
             card_id = str(uuid.uuid4())
             card = Models.Card(
-                collectionId=element.collectionId,
+                collectionId=cards.collectionId,
                 cardId=card_id,
                 front=element.front,
                 back=element.back,

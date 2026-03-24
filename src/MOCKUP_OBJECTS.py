@@ -41,44 +41,44 @@ user_bob = Models.User(
 )
 
 category_1 = Models.Category(
-    label="MATHEMATIK",
-    value="Mathematik"
+    label="Mathematik",
+    value="mathematik"
 )
 category_2 = Models.Category(
-    label="DEUTSCH",
-    value="Deutsch"
+    label="Deutsch",
+    value="deutsch"
 )
 category_3 = Models.Category(
-    label="ENGLISCH",
-    value="Englisch"
+    label="Englisch",
+    value="englisch"
 )
 category_4 = Models.Category(
-    label="PHYSIK",
-    value="Physik"
+    label="Physik",
+    value="physik"
 )
 category_5 = Models.Category(
-    label="BIOLOGIE",
-    value="Biologie"
+    label="Biologie",
+    value="biologie"
 )
 category_6 = Models.Category(
-    label="CHEMIE",
-    value="Chemie"
+    label="Chemie",
+    value="chemie"
 )
 category_7 = Models.Category(
-    label="INFORMATIK",
-    value="Informatik"
+    label="Informatik",
+    value="informatik"
 )
 category_8 = Models.Category(
-    label="SPORT",
-    value="Sport"
+    label="Sport",
+    value="sport"
 )
 category_9 = Models.Category(
-    label="SPANISCH",
-    value="Spanisch"
+    label="Spanisch",
+    value="spanisch"
 )
 category_10 = Models.Category(
-    label="LATEIN",
-    value="Latein"
+    label="Latein",
+    value="latein"
 )
 
 collection_1 = Models.Collection(

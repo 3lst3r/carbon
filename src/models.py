@@ -79,11 +79,15 @@ class PutCard(BaseModel):
     back: str
     notes: str
 
+
 class PostCard(BaseModel):
-    collectionId: str
     front: str
     back: str
     notes: str
+
+class PostCards(BaseModel):
+    collectionId: str
+    cards: list[PostCard]
 
 class PostFavorite(BaseModel):
     userId: str
