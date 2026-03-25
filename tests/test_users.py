@@ -48,6 +48,8 @@ ALICE_PUBLIC = {
     "createdAt": ALICE.createdAt
 }
 
+# GET /api/user
+# GET /api/users
 class TestGetUsers:
     # empty user list
     def test_empty_user_list(self, test_client: TestClient):
@@ -72,6 +74,7 @@ class TestGetUsers:
         test_client.post("/api/user", json=CARL)
         return
 
+# POST /api/user
 class TestPostUsers:
     # new user
     def test_new_user(self, test_client: TestClient):
@@ -89,6 +92,7 @@ class TestPostUsers:
         response = test_client.post("/api/signup", json={"name": "Carl"})
         assert response.status_code == 400
 
+# PUT /api/user
 class TestPutUsers:
     # update user
     def test(self, test_client: TestClient):
@@ -102,6 +106,7 @@ class TestPutUsers:
     def test(self, test_client: TestClient):
         return
 
+# DELETE /api/user
 class TestDeleteUsers:
     # delete user
     def test(self, test_client: TestClient):
