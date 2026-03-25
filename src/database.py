@@ -12,7 +12,7 @@ from src import config
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 client = MongoClient(f"mongodb://{config.MONGO_HOST}:{config.MONGO_PORT}")
 db = client["carbon_db"]
@@ -84,19 +84,19 @@ def get_all_users():
         raise HTTPException(status_code=500)
 
 def create_user(name: str, email: str, password: str):
-    try:
-        user_id = str(uuid.uuid4())
-        user = Models.User(
-            userId=user_id,
-            name=name,
-            email=email,
-            pass_hash=bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()),
-            createdAt=int(time.time())
-        )
-        users_table.insert_one(user.model_dump())
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=400)
+    res = users_table.find_one({"name": name})
+    if res is not None:
+        raise HTTPException(status_code=409)
+    user_id = str(uuid.uuid4())
+    user = Models.User(
+        userId=user_id,
+        name=name,
+        email=email,
+        pass_hash=bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()),
+        createdAt=int(time.time())
+    )
+    users_table.insert_one(user.model_dump())
+
 
 def read_user_by_email(email: str):
     try:
@@ -429,7 +429,7 @@ def get_all_categories():
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     token = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return token

@@ -48,7 +48,7 @@ ALICE_PUBLIC = {
     "createdAt": ALICE.createdAt
 }
 
-# GET /api/user
+# GET /api/user/{userId}
 # GET /api/users
 class TestGetUsers:
     # empty user list
@@ -66,8 +66,15 @@ class TestGetUsers:
     # get user by name
     def test(self, test_client: TestClient):
         test_client.post("/api/user", json=CARL)
-        response = test_client.get(f"/api/user/{CARL["name"]}")
+        response = test_client.get(f"/api/user/{CARL["userId"]}")
         assert response.status_code == 200
+        temp = response.json()
+        assert temp["userId"] is not None
+        assert temp["name"] == "Carl"
+        assert temp["email"] == "carl@example.com"
+        assert temp["password"] is None
+        assert temp["pass_hash"] is None
+        assert temp["createdAt"] is not None
     
     # get user by email
     def test(self, test_client: TestClient):
@@ -90,7 +97,7 @@ class TestPostUsers:
     # error incomplete user
     def test_error_incomplete_user(self, test_client: TestClient):
         response = test_client.post("/api/signup", json={"name": "Carl"})
-        assert response.status_code == 400
+        assert response.status_code == 422
 
 # PUT /api/user
 class TestPutUsers:
@@ -115,3 +122,5 @@ class TestDeleteUsers:
     # error not existing user
     def test(self, test_client: TestClient):
         return
+
+# GET /api/user_by_email/{email}
