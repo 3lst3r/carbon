@@ -73,6 +73,17 @@ def get_popular_collections():
 def get_collection(collection_id: str):
     return database.read_collection(collection_id=collection_id)
 
+@app.post("/api/collection", status_code=201)
+def post_collection(collection: models.PostCollection):
+    return database.create_collection(
+        user_id=collection.userId,
+        title=collection.title,
+        description=collection.description,
+        color=collection.color,
+        public=collection.public,
+        categories=collection.categories
+    )
+
 @app.put("/api/collection", status_code=201)
 def put_collection(collection: models.PutCollection):
     return database.update_collection(collection_id=collection.collectionId, title=collection.title, description=collection.description, color=collection.color, public=collection.public, categories=collection.categories)
@@ -120,17 +131,6 @@ def delete_saved_collection(favorite_id: str):
 @app.get("/api/categories", status_code=200)
 def get_all_categories():
     return database.get_all_categories()
-
-@app.post("/api/collection", status_code=201)
-def post_collection(collection: models.PostCollection):
-    return database.create_collection(
-        user_id=collection.userId,
-        title=collection.title,
-        description=collection.description,
-        color=collection.color,
-        public=collection.public,
-        categories=collection.categories
-    )
 
 @app.get("/api/search")
 def search_collection(query: str = Query(...)):
