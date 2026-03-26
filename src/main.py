@@ -53,7 +53,7 @@ def get_user_by_user_id(userId: str):
 def get_user_by_name(name: str):
     return database.read_user_by_name(name=name)
 
-@app.put("/api/user", status_code=201)
+@app.put("/api/user", status_code=204)
 def put_user(user: models.PutUser):
     return database.update_user(user_id=user.userId, name=user.name, email=user.email, password=user.password)
 
@@ -84,7 +84,7 @@ def post_collection(collection: models.PostCollection):
         categories=collection.categories
     )
 
-@app.put("/api/collection", status_code=201)
+@app.put("/api/collection", status_code=204)
 def put_collection(collection: models.PutCollection):
     return database.update_collection(collection_id=collection.collectionId, title=collection.title, description=collection.description, color=collection.color, public=collection.public, categories=collection.categories)
 
@@ -100,7 +100,7 @@ def get_cards():
 def get_card(card_id: str):
     return database.read_card(card_id=card_id)
 
-@app.put("/api/card", status_code=201)
+@app.put("/api/card", status_code=204)
 def put_card(card: models.PutCard):
     return database.update_card(card_id=card.cardId, front=card.front, back=card.back, notes=card.notes)
 

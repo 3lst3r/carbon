@@ -47,3 +47,12 @@ ALICE_PUBLIC = {
     "email": ALICE.email,
     "createdAt": ALICE.createdAt
 }
+
+class TestHealth:
+    def test_get_health(self, test_client: TestClient):
+        response = test_client.get("/health")
+        assert response.status_code == 200
+        assert response.json() == {
+            "database": "up",
+            "status": "ok"
+        }

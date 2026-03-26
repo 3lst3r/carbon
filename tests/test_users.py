@@ -40,6 +40,11 @@ CARL = {
     "email": "carl@example.com",
     "password": "carl123"
 }
+CARL_UPDATED = {
+    "name": "Carl Updated",
+    "email": "carl-updated@example.com",
+    "password": "carl123updated"
+}
 
 ALICE_PUBLIC = {
     "userId": ALICE.userId,
@@ -48,9 +53,8 @@ ALICE_PUBLIC = {
     "createdAt": ALICE.createdAt
 }
 
-# GET /api/user/{userId}
 # GET /api/users
-class TestGetUsers:
+class TestGetAllUsers:
     # empty user list
     def test_empty_user_list(self, test_client: TestClient):
         response = test_client.get("/api/users")
@@ -59,32 +63,76 @@ class TestGetUsers:
     
     # filled user list
     def test_filled_user_list(self, test_client: TestClient):
-        test_client.post("/api/user", json=CARL)
+        test_client.post("/api/signup", json=CARL)
         response = test_client.get("/api/users")
         assert response.status_code == 200
-    
-    # get user by name
-    def test(self, test_client: TestClient):
-        test_client.post("/api/user", json=CARL)
-        response = test_client.get(f"/api/user/{CARL["userId"]}")
+        assert response.json() is not None
+
+# GET /api/user/{userId}
+class TestGetUserByUserId:
+    # get user by id
+    def test_get_existing_user_by_user_id(self, test_client: TestClient):
+        test_client.post("/api/signup", json=CARL)
+        user_id = test_client.get("/api/users").json()[0]["userId"]
+        response = test_client.get(f"/api/user/{user_id}")
+        assert response.status_code == 200
+        temp = response.json()
+        assert temp["userId"] == user_id
+        assert temp["name"] == CARL["name"]
+        assert temp["email"] == CARL["email"]
+        assert "password" not in temp
+        assert "pass_hash" not in temp
+        assert temp["createdAt"] is not None
+
+    # error userId does not exist
+    def test_get_error_by_false_user_id(self, test_client: TestClient):
+        response = test_client.get("/api/user/false-user-id")
+        assert response.status_code == 404
+
+# GET /api/user_by_email/{email}
+class TestGetUserByUserEmail:
+    # get user by email
+    def test_get_existing_user_by_user_id(self, test_client: TestClient):
+        test_client.post("/api/signup", json=CARL)
+        response = test_client.get(f"/api/user_by_email/{CARL["email"]}")
         assert response.status_code == 200
         temp = response.json()
         assert temp["userId"] is not None
-        assert temp["name"] == "Carl"
-        assert temp["email"] == "carl@example.com"
-        assert temp["password"] is None
-        assert temp["pass_hash"] is None
+        assert temp["name"] == CARL["name"]
+        assert temp["email"] == CARL["email"]
+        assert "password" not in temp
+        assert "pass_hash" not in temp
         assert temp["createdAt"] is not None
-    
-    # get user by email
-    def test(self, test_client: TestClient):
-        test_client.post("/api/user", json=CARL)
-        return
+
+    # error email does not exist
+    def test_get_error_by_false_email(self, test_client: TestClient):
+        response = test_client.get("/api/user_by_email/wrong@false.com")
+        assert response.status_code == 404
+
+# GET /api/user_by_name/{name}
+class TestGetUserByUserName:
+    # get user by name
+    def test_get_existing_user_by_name(self, test_client: TestClient):
+        test_client.post("/api/signup", json=CARL)
+        response = test_client.get(f"/api/user_by_name/{CARL["name"]}")
+        assert response.status_code == 200
+        temp = response.json()
+        assert temp["userId"] is not None
+        assert temp["name"] == CARL["name"]
+        assert temp["email"] == CARL["email"]
+        assert "password" not in temp
+        assert "pass_hash" not in temp
+        assert temp["createdAt"] is not None
+
+    # error name does not exist
+    def test_get_error_by_false_user_name(self, test_client: TestClient):
+        response = test_client.get("/api/user_by_name/false-name")
+        assert response.status_code == 404
 
 # POST /api/user
-class TestPostUsers:
-    # new user
-    def test_new_user(self, test_client: TestClient):
+class TestPostUser:
+    # create new user
+    def test_create_new_user(self, test_client: TestClient):
         response = test_client.post("/api/signup", json=CARL)
         assert response.status_code == 201
     
@@ -94,33 +142,56 @@ class TestPostUsers:
         response = test_client.post("/api/signup", json=CARL)
         assert response.status_code == 409
     
-    # error incomplete user
+    # error wrong syntax
     def test_error_incomplete_user(self, test_client: TestClient):
         response = test_client.post("/api/signup", json={"name": "Carl"})
         assert response.status_code == 422
 
 # PUT /api/user
-class TestPutUsers:
+class TestPutUser:
     # update user
-    def test(self, test_client: TestClient):
-        return
+    def test_update_existing_user(self, test_client: TestClient):
+        test_client.post("/api/signup", json=CARL)
+        user_id = test_client.get("/api/users").json()[0]["userId"]
+        response = test_client.put("/api/user", json={
+            "userId": user_id,
+            "name": CARL_UPDATED["name"],
+            "email": CARL_UPDATED["email"],
+            "password": CARL_UPDATED["password"]
+        })
+        assert response.status_code == 204
     
     # error not existing user
-    def test(self, test_client: TestClient):
-        return
+    def test_error_user_id_does_not_exist(self, test_client: TestClient):
+        response = test_client.put("/api/user", json={
+            "userId": "false-user-id",
+            "name": CARL_UPDATED["name"],
+            "email": CARL_UPDATED["email"],
+            "password": CARL_UPDATED["password"]
+        })
+        assert response.status_code == 404
     
     # error incomplete user
-    def test(self, test_client: TestClient):
-        return
+    def test_error_incomplete_request_body(self, test_client: TestClient):
+        test_client.post("/api/signup", json=CARL)
+        user_id = test_client.get("/api/users").json()[0]["userId"]
+        response = test_client.put("/api/user", json={
+            "userId": user_id,
+            "email": CARL_UPDATED["email"],
+            "password": CARL_UPDATED["password"]
+        })
+        assert response.status_code == 422
 
 # DELETE /api/user
-class TestDeleteUsers:
+class TestDeleteUser:
     # delete user
-    def test(self, test_client: TestClient):
-        return
+    def test_delete_existing_user(self, test_client: TestClient):
+        test_client.post("/api/signup", json=CARL)
+        user_id = test_client.get("/api/users").json()[0]["userId"]
+        response = test_client.delete(f"/api/user/{user_id}")
+        assert response.status_code == 200
     
     # error not existing user
-    def test(self, test_client: TestClient):
-        return
-
-# GET /api/user_by_email/{email}
+    def test_error_user_does_not_exist(self, test_client: TestClient):
+        response = test_client.delete(f"/api/user/false-user-id")
+        assert response.status_code == 404

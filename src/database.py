@@ -108,9 +108,8 @@ def read_user_by_email(email: str):
             "createdAt": res["createdAt"],
             "collections": get_collections_from_user_id(res["userId"])
         }
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500)
+    except TypeError:
+        raise HTTPException(status_code=404)
 
 def read_user_by_user_id(user_id: str):
     try:
@@ -122,8 +121,8 @@ def read_user_by_user_id(user_id: str):
             "createdAt": res["createdAt"],
             "collections": get_collections_from_user_id(res["userId"])
         }
-    except:
-        raise HTTPException(status_code=500)
+    except TypeError:
+        raise HTTPException(status_code=404)
 
 def read_user_by_user_id_raw(user_id: str):
     try:
@@ -134,8 +133,8 @@ def read_user_by_user_id_raw(user_id: str):
             "email": res["email"],
             "createdAt": res["createdAt"]
         }
-    except:
-        raise HTTPException(status_code=500)
+    except TypeError:
+        raise HTTPException(status_code=404)
 
 def read_user_by_name(name: str):
     try:
@@ -147,31 +146,27 @@ def read_user_by_name(name: str):
             "createdAt": res["createdAt"],
             "collections": get_collections_from_user_id(res["userId"])
         }
-    except:
-        raise HTTPException(status_code=500)
+    except TypeError:
+        raise HTTPException(status_code=404)
 
 def update_user(user_id: str, name: str, email: str, password: str):
-    try:
-        users_table.find_one_and_update(
-            {"userId": user_id}, 
-            {
-                "$set": {
-                    "name": name,
-                    "email": email,
-                    "pass_hash": bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-                }
+    res = users_table.find_one_and_update(
+        {"userId": user_id}, 
+        {
+            "$set": {
+                "name": name,
+                "email": email,
+                "pass_hash": bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
             }
-        )
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500)
+        }
+    )
+    if res is None:
+        raise HTTPException(status_code=404)
 
 def delete_user(user_id: str):
-    try:
-        users_table.find_one_and_delete({"userId": user_id})
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500)
+    res =users_table.find_one_and_delete({"userId": user_id})
+    if res is None:
+        raise HTTPException(status_code=404)
 
 def get_all_collections():
     try:
