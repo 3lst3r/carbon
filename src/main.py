@@ -154,7 +154,7 @@ def get_login_info(current_user = Depends(database.get_current_user_optional)):
 async def login(user: models.PostLogin, response: Response):
     return database.login(email=user.email, password=user.password, response=response)
 
-@app.post("/api/logout", status_code=201)
+@app.delete("/api/logout", status_code=201)
 async def logout(response: Response):
     return database.logout(response=response)
 
