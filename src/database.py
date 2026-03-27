@@ -478,11 +478,30 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=401, detail="User not found")
     return user
 
-def get_current_user_optional(token: str = Depends(oauth2_scheme)):
-    if token is None:
+# def get_current_user_optional(token: str = Depends(oauth2_scheme)):
+#     if token is None:
+#         return False
+#     try:
+#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+#         user_email = payload.get("sub")
+#         if user_email is None:
+#             raise HTTPException(status_code=500, detail="token contains no field 'email'")
+#     except JWTError:
+#         raise HTTPException(status_code=500, detail="a JWTError occured")
+
+#     user = users_table.find_one({"email": user_email}, {"_id": 0, "pass_hash": 0, "createdAt": 0})
+#     if user is None:
+#         raise HTTPException(status_code=500, detail="user not found in database")
+
+#     return user
+
+from fastapi import Cookie
+
+def get_current_user_optional(access_token: str | None = Cookie(default=None)):
+    if access_token is None:
         return False
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
         user_email = payload.get("sub")
         if user_email is None:
             raise HTTPException(status_code=500, detail="token contains no field 'email'")
