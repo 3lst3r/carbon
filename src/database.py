@@ -505,7 +505,8 @@ def get_current_user_optional(access_token: str | None = Cookie(default=None)):
         user_email = payload.get("sub")
         if user_email is None:
             raise HTTPException(status_code=500, detail="token contains no field 'email'")
-    except JWTError:
+    except JWTError as e:
+        print(e)
         raise HTTPException(status_code=500, detail="a JWTError occured")
 
     user = users_table.find_one({"email": user_email}, {"_id": 0, "pass_hash": 0, "createdAt": 0})
