@@ -171,16 +171,20 @@ class TestPutUser:
         })
         assert response.status_code == 404
     
-    # error incomplete user
+    # update only one field
     def test_error_incomplete_request_body(self, test_client: TestClient):
         test_client.post("/api/signup", json=CARL)
         user_id = test_client.get("/api/users").json()[0]["userId"]
         response = test_client.put("/api/user", json={
             "userId": user_id,
-            "email": CARL_UPDATED["email"],
-            "password": CARL_UPDATED["password"]
+            "email": CARL_UPDATED["email"]
         })
-        assert response.status_code == 422
+        assert response.status_code == 204
+        response2 = test_client.get(f"/api/user_by_name/{CARL["name"]}")
+        assert response2.status_code == 200
+        res_json = response2.json()
+        assert res_json["name"] == CARL["name"]
+        assert res_json["email"] == CARL_UPDATED["email"]
 
 # DELETE /api/user
 class TestDeleteUser:

@@ -53,9 +53,9 @@ class PostUser(BaseModel):
 
 class PutUser(BaseModel):
     userId: str
-    name: str
-    email: str
-    password: str
+    name: str = None
+    email: str = None
+    password: str = None
 
 class PostCollection(BaseModel):
     userId: str
@@ -67,23 +67,23 @@ class PostCollection(BaseModel):
 
 class PutCollection(BaseModel):
     collectionId: str
-    title: str
-    description: str
-    color: Color
-    public: bool
-    categories: list[Category]
+    title: str = None
+    description: str = None
+    color: Color = None
+    public: bool = None
+    categories: list[Category] = None
 
 class PutCard(BaseModel):
     cardId: str
-    front: str
-    back: str
-    notes: str
+    front: str = None
+    back: str = None
+    notes: str = None
 
 
 class PostCard(BaseModel):
     front: str
     back: str
-    notes: str
+    notes: str = ""
 
 class PostCards(BaseModel):
     collectionId: str

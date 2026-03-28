@@ -154,9 +154,9 @@ def update_user(user_id: str, name: str, email: str, password: str):
         {"userId": user_id}, 
         {
             "$set": {
-                "name": name,
-                "email": email,
-                "pass_hash": bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+                **({"name": name} if name is not None else {}),
+                **({"email": email} if email is not None else {}),
+                **({"pass_hash": bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())} if password is not None else {})
             }
         }
     )
@@ -292,20 +292,23 @@ def read_collection(collection_id: str):
 def update_collection(collection_id: str, title: str, description: str, color: Models.Color, public: bool, categories: list[Models.Category]):
     try:
         temp = []
-        for element in categories:
-            temp.append({
-                "label": element.label,
-                "value": element.value
-            })
+        if categories is None:
+            temp = None
+        else:
+            for element in categories:
+                temp.append({
+                    "label": element.label,
+                    "value": element.value
+                })
         collections_table.find_one_and_update(
             {"collectionId": collection_id}, 
             {
                 "$set": {
-                    "title": title,
-                    "description": description,
-                    "color": color,
-                    "public": public,
-                    "categories": temp
+                    **({"title": title} if title is not None else {}),
+                    **({"description": description} if description is not None else {}),
+                    **({"color": color} if color is not None else {}),
+                    **({"public": public} if public is not None else {}),
+                    **({"categories": temp} if temp is not None else {})
                 }
             }
         )
@@ -363,9 +366,9 @@ def update_card(card_id: str, front: str, back: str, notes: str):
             {"cardId": card_id}, 
             {
                 "$set": {
-                    "front": front,
-                    "back": back,
-                    "notes": notes
+                    **({"front": front} if front is not None else {}),
+                    **({"back": back} if back is not None else {}),
+                    **({"notes": notes} if notes is not None else {})
                 }
             }
         )
