@@ -93,6 +93,10 @@ class PostFavorite(BaseModel):
     userId: str
     collectionId: str
 
+class DeleteFavorite(BaseModel):
+    userId: str
+    collectionId: str
+
 class PostLogin(BaseModel):
     email: str
     password: str

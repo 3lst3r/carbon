@@ -410,9 +410,9 @@ def read_favorites(user_id: str):
     except:
         raise HTTPException(status_code=500)
 
-def delete_favorite(favorite_id: str):
+def delete_favorite(user_id: str, collection_id: str):
     try:
-        favorites_table.find_one_and_delete({"favoriteId": favorite_id})
+        favorites_table.find_one_and_delete({"userId": user_id, "collectionId": collection_id})
     except:
         raise HTTPException(status_code=500)
 
@@ -439,7 +439,7 @@ def signup(name: str, email: str, password: str, response: Response):
 def login(email: str, password: str, response: Response):
     res = users_table.find_one({"email": email}, {"_id": 0})
     if not res:
-        return {"msg": "credentials unmatching"}
+        return {"msg": "credentials not matching"}
     if bcrypt.checkpw(password.encode("utf-8"), res["pass_hash"]):
         token = create_access_token({
             "sub": res["email"],
@@ -457,7 +457,7 @@ def login(email: str, password: str, response: Response):
             "email": res["email"],
             "userId": str(res["userId"])
         }
-    return {"msg": "credentials unmatching"}
+    return {"msg": "credentials not matching"}
 
 def logout(response: Response):
     response.delete_cookie(
@@ -509,11 +509,11 @@ def get_current_user_optional(access_token: str | None = Cookie(default=None)):
         if user_email is None:
             raise HTTPException(status_code=500, detail="token contains no field 'email'")
     except JWTError as e:
-        print(e)
-        raise HTTPException(status_code=500, detail="a JWTError occured")
+        print(f"JWT Error: {e}")
+        return False
 
     user = users_table.find_one({"email": user_email}, {"_id": 0, "pass_hash": 0, "createdAt": 0})
     if user is None:
-        raise HTTPException(status_code=500, detail="user not found in database")
+        raise HTTPException(status_code=404, detail="user not found in database")
 
     return user

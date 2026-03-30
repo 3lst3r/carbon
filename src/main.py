@@ -124,9 +124,9 @@ def get_all_saved_collections():
 def get_saved_collection(user_id: str):
     return database.read_favorites(user_id=user_id)
 
-@app.delete("/api/saved/{favorite_id}", status_code=200)
-def delete_saved_collection(favorite_id: str):
-    return database.delete_favorite(favorite_id=favorite_id)
+@app.delete("/api/saved", status_code=200)
+def delete_saved_collection(favorite: models.DeleteFavorite):
+    return database.delete_favorite(user_id=favorite.userId, collection_id=favorite.collectionId)
 
 @app.get("/api/categories", status_code=200)
 def get_all_categories():
