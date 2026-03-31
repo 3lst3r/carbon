@@ -152,7 +152,7 @@ class TestDeleteUser:
         test_client.post("/api/signup", json=CARL)
         user_id = test_client.get("/api/users").json()[0]["userId"]
         response = test_client.delete(f"/api/user/{user_id}")
-        assert response.status_code == 200
+        assert response.status_code == 204
     
     # error not existing user
     def test_error_user_does_not_exist(self, test_client: TestClient):

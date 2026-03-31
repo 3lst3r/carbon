@@ -57,7 +57,7 @@ def get_user_by_name(name: str):
 def put_user(user: models.PutUser):
     return database.update_user(user_id=user.userId, name=user.name, email=user.email, password=user.password)
 
-@app.delete("/api/user/{user_id}", status_code=200)
+@app.delete("/api/user/{user_id}", status_code=204)
 def delete_user(user_id: str):
     return database.delete_user(user_id)
 
@@ -88,7 +88,7 @@ def post_collection(collection: models.PostCollection):
 def put_collection(collection: models.PutCollection):
     return database.update_collection(collection_id=collection.collectionId, title=collection.title, description=collection.description, color=collection.color, public=collection.public, categories=collection.categories)
 
-@app.delete("/api/collection/{collection_id}", status_code=200)
+@app.delete("/api/collection/{collection_id}", status_code=204)
 def delete_collection(collection_id: str):
     return database.delete_collection(collection_id=collection_id)
 
@@ -108,7 +108,7 @@ def put_card(card: models.PutCard):
 def post_cards(cards: models.PostCards):
     return database.create_cards(cards)
 
-@app.delete("/api/card/{card_id}", status_code=200)
+@app.delete("/api/card/{card_id}", status_code=204)
 def delete_card(card_id: str):
     return database.delete_card(card_id=card_id)
 
@@ -124,7 +124,7 @@ def get_all_saved_collections():
 def get_saved_collection(user_id: str):
     return database.read_favorites(user_id=user_id)
 
-@app.delete("/api/saved", status_code=200)
+@app.delete("/api/saved", status_code=204)
 def delete_saved_collection(favorite: models.DeleteFavorite):
     return database.delete_favorite(user_id=favorite.userId, collection_id=favorite.collectionId)
 
@@ -154,7 +154,7 @@ def get_login_info(current_user = Depends(database.get_current_user_optional)):
 async def login(user: models.PostLogin, response: Response):
     return database.login(email=user.email, password=user.password, response=response)
 
-@app.delete("/api/logout", status_code=201)
+@app.delete("/api/logout", status_code=204)
 async def logout(response: Response):
     return database.logout(response=response)
 

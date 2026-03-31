@@ -164,7 +164,7 @@ def update_user(user_id: str, name: str, email: str, password: str):
         raise HTTPException(status_code=404)
 
 def delete_user(user_id: str):
-    res =users_table.find_one_and_delete({"userId": user_id})
+    res = users_table.find_one_and_delete({"userId": user_id})
     if res is None:
         raise HTTPException(status_code=404)
 
@@ -232,95 +232,86 @@ def get_collections_from_category(category: str):
         raise HTTPException(status_code=500)
 
 def get_collections_from_user_id(user_id: str):
-    try:
-        res = list(collections_table.find({"userId": user_id}, {"_id": 0}))
-        temp = []
-        for element in res:
-            temp.append({
-            "user": read_user_by_user_id_raw(element["userId"]),
-            "collectionId": element["collectionId"],
-            "title": element["title"],
-            "description": element["description"],
-            "color": element["color"],
-            "public": element["public"],
-            "createdAt": element["createdAt"],
-            "categories": element["categories"],
-            "cards": read_cards_from_collection(element["collectionId"])
-        })
-        return temp
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500)
+    res_raw = collections_table.find({"userId": user_id}, {"_id": 0})
+    if res_raw is None:
+        raise HTTPException(status_code=404)
+    res = list(res_raw)
+    temp = []
+    for element in res:
+        temp.append({
+        "user": read_user_by_user_id_raw(element["userId"]),
+        "collectionId": element["collectionId"],
+        "title": element["title"],
+        "description": element["description"],
+        "color": element["color"],
+        "public": element["public"],
+        "createdAt": element["createdAt"],
+        "categories": element["categories"],
+        "cards": read_cards_from_collection(element["collectionId"])
+    })
+    return temp
 
 def create_collection(user_id: str, title: str, description: str, color: Models.Color, public: bool, categories: list[Models.Category]):
-    try:
-        collection_id = str(uuid.uuid4())
-        collection = Models.Collection(
-            userId=user_id,
-            collectionId=collection_id,
-            title=title,
-            description=description,
-            color=color,
-            public=public,
-            createdAt=int(time.time()),
-            categories=categories
-        )
-        collections_table.insert_one(collection.model_dump())
-        return read_collection(collection_id=collection_id)
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=400)
+    read_user_by_user_id_raw(user_id=user_id)
+    collection_id = str(uuid.uuid4())
+    collection = Models.Collection(
+        userId=user_id,
+        collectionId=collection_id,
+        title=title,
+        description=description,
+        color=color,
+        public=public,
+        createdAt=int(time.time()),
+        categories=categories
+    )
+    collections_table.insert_one(collection.model_dump())
+    return read_collection(collection_id=collection_id)
 
 def read_collection(collection_id: str):
-    try:
-        res = collections_table.find_one({"collectionId": collection_id}, {"_id": 0})
-        return {
-            "user": read_user_by_user_id_raw(res["userId"]),
-            "collectionId": collection_id,
-            "title": res["title"],
-            "description": res["description"],
-            "color": res["color"],
-            "public": res["public"],
-            "createdAt": res["createdAt"],
-            "categories": res["categories"],
-            "cards": read_cards_from_collection(collection_id)
-        }
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500)
+    res = collections_table.find_one({"collectionId": collection_id}, {"_id": 0})
+    if res is None:
+        raise HTTPException(status_code=404)
+    return {
+        "user": read_user_by_user_id_raw(res["userId"]),
+        "collectionId": collection_id,
+        "title": res["title"],
+        "description": res["description"],
+        "color": res["color"],
+        "public": res["public"],
+        "createdAt": res["createdAt"],
+        "categories": res["categories"],
+        "cards": read_cards_from_collection(collection_id)
+    }
 
 def update_collection(collection_id: str, title: str, description: str, color: Models.Color, public: bool, categories: list[Models.Category]):
-    try:
-        temp = []
-        if categories is None:
-            temp = None
-        else:
-            for element in categories:
-                temp.append({
-                    "label": element.label,
-                    "value": element.value
-                })
-        collections_table.find_one_and_update(
-            {"collectionId": collection_id}, 
-            {
-                "$set": {
-                    **({"title": title} if title is not None else {}),
-                    **({"description": description} if description is not None else {}),
-                    **({"color": color} if color is not None else {}),
-                    **({"public": public} if public is not None else {}),
-                    **({"categories": temp} if temp is not None else {})
-                }
+    temp = []
+    if categories is None:
+        temp = None
+    else:
+        for element in categories:
+            temp.append({
+                "label": element.label,
+                "value": element.value
+            })
+    res = collections_table.find_one_and_update(
+        {"collectionId": collection_id}, 
+        {
+            "$set": {
+                **({"title": title} if title is not None else {}),
+                **({"description": description} if description is not None else {}),
+                **({"color": color} if color is not None else {}),
+                **({"public": public} if public is not None else {}),
+                **({"categories": temp} if temp is not None else {})
             }
-        )
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500)
+        }
+    )
+    if res is None:
+        raise HTTPException(status_code=404)
 
 def delete_collection(collection_id: str):
-    try:
-        collections_table.find_one_and_delete({"collectionId": collection_id})
-    except:
-        raise HTTPException(status_code=500)
+    res = collections_table.find_one_and_delete({"collectionId": collection_id})
+    if res is None:
+        raise HTTPException(status_code=404)
 
 def get_all_cards():
     try:
