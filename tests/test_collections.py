@@ -1,37 +1,6 @@
 import pytest
-import mongomock
-from unittest.mock import patch
 from fastapi.testclient import TestClient
 from src import MOCKUP_OBJECTS
-
-@pytest.fixture(scope="function")
-def mock_collections():
-    mongo_client = mongomock.MongoClient()
-    db = mongo_client["carbon_db"]
-    return {
-        "db": db,
-        "users": db["users"],
-        "collections": db["collections"],
-        "cards": db["cards"],
-        "favorites": db["favorites"]
-    }
-
-@pytest.fixture(scope="function")
-def client(mock_collections: dict):
-    with (
-        patch("src.database.db", mock_collections["db"]),
-        patch("src.database.users_table", mock_collections["users"]),
-        patch("src.database.collections_table", mock_collections["collections"]),
-        patch("src.database.cards_table", mock_collections["cards"]),
-        patch("src.database.favorites_table", mock_collections["favorites"]),
-    ):
-        from src.main import app
-        yield TestClient(app), mock_collections
-
-@pytest.fixture(scope="function")
-def test_client(client) -> TestClient:
-    http_client, _ = client
-    return http_client
 
 ALICE = MOCKUP_OBJECTS.user_alice
 BOB = MOCKUP_OBJECTS.user_bob
@@ -48,3 +17,24 @@ ALICE_PUBLIC = {
     "createdAt": ALICE.createdAt
 }
 
+def create_user_and_get_user_id(test_client: TestClient):
+    test_client.post("/api/signup", json=CARL)
+    return test_client.get("/api/user_by_name/Carl").json()["userId"]
+
+class TestGetAllCollections:
+    # empty collection list
+    def test_empty_collection_list(self, test_client: TestClient):
+        response = test_client.get("/api/collections")
+        assert response.status_code == 200
+        assert response.json() == []
+    
+    # filled collection list
+    def test_filled_collection_list(self, test_client: TestClient):
+        user_id = create_user_and_get_user_id(test_client=test_client)
+        test_client.post("/api/collection", json={
+            "userId": user_id,
+            "title": "Title"
+        })
+        response = test_client.get("/api/collections")
+        assert response.status_code == 200
+        assert response.json() is not None
