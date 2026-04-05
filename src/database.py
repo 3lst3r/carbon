@@ -338,11 +338,10 @@ def create_cards(cards: Models.PostCards):
         raise HTTPException(status_code=500)
 
 def read_card(card_id: str):
-    try:
-        res = cards_table.find_one({"cardId": card_id}, {"_id": 0})
-        return res
-    except:
-        raise HTTPException(status_code=500)
+    res = cards_table.find_one({"cardId": card_id}, {"_id": 0})
+    if res is None:
+        raise HTTPException(status_code=404)
+    return res
 
 def read_cards_from_collection(collection_id: str):
     try:

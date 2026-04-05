@@ -53,11 +53,47 @@ class TestGetAllCards:
 class TestGetCardById:
     # card by id
     def test_get_card_by_id(self, test_client: TestClient):
-        assert True
+        collection_id = create_collection_and_get_collection_id(test_client=test_client)
+        front = "test front"
+        back = "test back"
+        notes = "test notes"
+        test_client.post("/api/card", json={
+            "collectionId": collection_id,
+            "cards": [
+                {
+                    "front": front,
+                    "back": back,
+                    "notes": notes
+                }
+            ]
+        })
+        res = test_client.get("/api/cards")
+        card_id = res.json()[0]["cardId"]
+        response = test_client.get(f"/api/card/{card_id}")
+        assert response.status_code == 200
+        assert response.json()["cardId"] == card_id
+        assert response.json()["front"] == front
+        assert response.json()["back"] == back
+        assert response.json()["notes"] == notes
     
     # error card id does not exist
     def test_error_get_card_id_does_not_exist(self, test_client: TestClient):
-        assert True
+        collection_id = create_collection_and_get_collection_id(test_client=test_client)
+        front = "test front"
+        back = "test back"
+        notes = "test notes"
+        test_client.post("/api/card", json={
+            "collectionId": collection_id,
+            "cards": [
+                {
+                    "front": front,
+                    "back": back,
+                    "notes": notes
+                }
+            ]
+        })
+        response = test_client.get("/api/card/wrong-card-id")
+        assert response.status_code == 404
 
 class TestPostCard:
     # post card by id
