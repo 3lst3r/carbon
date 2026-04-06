@@ -367,19 +367,16 @@ def delete_card(card_id: str):
         raise HTTPException(status_code=404)
 
 def create_favorite(user_id: str, collection_id: str):
-    try:
-        favorite_id = str(uuid.uuid4())
-        favorite = Models.Favorite(
-            userId=user_id,
-            collectionId=collection_id,
-            favoriteId=favorite_id,
-            createdAt=int(time.time())
-        )
-        favorites_table.insert_one(favorite.model_dump())
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=400)
-    return
+    read_user_by_user_id_raw(user_id=user_id)
+    read_collection(collection_id=collection_id)
+    favorite_id = str(uuid.uuid4())
+    favorite = Models.Favorite(
+        userId=user_id,
+        collectionId=collection_id,
+        favoriteId=favorite_id,
+        createdAt=int(time.time())
+    )
+    favorites_table.insert_one(favorite.model_dump())
 
 def get_all_favorites():
     try:
@@ -389,17 +386,14 @@ def get_all_favorites():
         raise HTTPException(status_code=500)
 
 def read_favorites(user_id: str):
-    try:
-        res = list(favorites_table.find({"userId": user_id}, {"_id": 0}))
-        return res
-    except:
-        raise HTTPException(status_code=500)
+    read_user_by_user_id_raw(user_id=user_id)
+    res = favorites_table.find({"userId": user_id}, {"_id": 0})
+    return list(res)
 
 def delete_favorite(user_id: str, collection_id: str):
-    try:
-        favorites_table.find_one_and_delete({"userId": user_id, "collectionId": collection_id})
-    except:
-        raise HTTPException(status_code=500)
+    res = favorites_table.find_one_and_delete({"userId": user_id, "collectionId": collection_id})
+    if res is None:
+        raise HTTPException(status_code=404)
 
 def get_all_categories():
     try:
