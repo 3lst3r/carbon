@@ -321,21 +321,18 @@ def get_all_cards():
         raise HTTPException(status_code=500)
 
 def create_cards(cards: Models.PostCards):
-    try:
-        for element in cards.cards:
-            card_id = str(uuid.uuid4())
-            card = Models.Card(
-                collectionId=cards.collectionId,
-                cardId=card_id,
-                front=element.front,
-                back=element.back,
-                notes=element.notes,
-                createdAt=int(time.time())
-            )
-            cards_table.insert_one(card.model_dump())
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500)
+    read_collection(collection_id=cards.collectionId)
+    for element in cards.cards:
+        card_id = str(uuid.uuid4())
+        card = Models.Card(
+            collectionId=cards.collectionId,
+            cardId=card_id,
+            front=element.front,
+            back=element.back,
+            notes=element.notes,
+            createdAt=int(time.time())
+        )
+        cards_table.insert_one(card.model_dump())
 
 def read_card(card_id: str):
     res = cards_table.find_one({"cardId": card_id}, {"_id": 0})

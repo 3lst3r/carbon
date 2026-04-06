@@ -98,15 +98,57 @@ class TestGetCardById:
 class TestPostCard:
     # post card by id
     def test_post_card_by_id(self, test_client: TestClient):
-        assert True
+        collection_id = create_collection_and_get_collection_id(test_client=test_client)
+        front = "test front"
+        back = "test back"
+        notes = "test notes"
+        response = test_client.post("/api/card", json={
+            "collectionId": collection_id,
+            "cards": [
+                {
+                    "front": front,
+                    "back": back,
+                    "notes": notes
+                }
+            ]
+        })
+        assert response.status_code == 201
     
     # error collection id does not exist
     def test_error_collection_id_does_not_exist(self, test_client: TestClient):
-        assert True
+        collection_id = create_collection_and_get_collection_id(test_client=test_client)
+        front = "test front"
+        back = "test back"
+        notes = "test notes"
+        response = test_client.post("/api/card", json={
+            "collectionId": "wrong-collection-id",
+            "cards": [
+                {
+                    "front": front,
+                    "back": back,
+                    "notes": notes
+                }
+            ]
+        })
+        assert response.status_code == 404
     
     # error wrong body format
     def test_error_post_wrong_body_format(self, test_client: TestClient):
-        assert True
+        collection_id = create_collection_and_get_collection_id(test_client=test_client)
+        front = "test front"
+        back = "test back"
+        notes = "test notes"
+        response = test_client.post("/api/card", json={
+            "collectionId": collection_id,
+            "cards": [
+                {
+                    "wrongFrontField": front,
+                    "back": back,
+                    "notes": notes
+                }
+            ]
+        })
+        assert response.status_code == 422
 
 class TestPutCard:
     # put card by card id
