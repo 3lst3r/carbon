@@ -348,25 +348,23 @@ def read_cards_from_collection(collection_id: str):
         raise HTTPException(status_code=500)
 
 def update_card(card_id: str, front: str, back: str, notes: str):
-    try:
-        cards_table.find_one_and_update(
-            {"cardId": card_id}, 
-            {
-                "$set": {
-                    **({"front": front} if front is not None else {}),
-                    **({"back": back} if back is not None else {}),
-                    **({"notes": notes} if notes is not None else {})
-                }
+    res = cards_table.find_one_and_update(
+        {"cardId": card_id}, 
+        {
+            "$set": {
+                **({"front": front} if front is not None else {}),
+                **({"back": back} if back is not None else {}),
+                **({"notes": notes} if notes is not None else {})
             }
-        )
-    except:
-        raise HTTPException(status_code=400)
+        }
+    )
+    if res is None:
+        raise HTTPException(status_code=404)
 
 def delete_card(card_id: str):
-    try:
-        cards_table.find_one_and_delete({"cardId": card_id})
-    except:
-        raise HTTPException(status_code=500)
+    res = cards_table.find_one_and_delete({"cardId": card_id})
+    if res is None:
+        raise HTTPException(status_code=404)
 
 def create_favorite(user_id: str, collection_id: str):
     try:

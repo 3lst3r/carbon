@@ -26,6 +26,25 @@ def create_collection_and_get_collection_id(test_client: TestClient):
     collection_id = test_client.get(f"/api/user/{user_id}").json()["collections"][0]["collectionId"]
     return collection_id
 
+def create_card_and_get_card_id(test_client: TestClient):
+    collection_id = create_collection_and_get_collection_id(test_client=test_client)
+    front = "test front"
+    back = "test back"
+    notes = "test notes"
+    test_client.post("/api/card", json={
+        "collectionId": collection_id,
+        "cards": [
+            {
+                "front": front,
+                "back": back,
+                "notes": notes
+            }
+        ]
+    })
+    response = test_client.get("/api/cards")
+    return response.json()[0]["cardId"]
+
+
 class TestGetAllCards:
     # empty card list
     def test_empty_card_list(self, test_client: TestClient):
@@ -153,21 +172,58 @@ class TestPostCard:
 class TestPutCard:
     # put card by card id
     def test_put_card_by_id(self, test_client: TestClient):
-        assert True
+        card_id = create_card_and_get_card_id(test_client=test_client)
+        front = "updated front"
+        back = "updated back"
+        notes = "updated notes"
+        response1 = test_client.put("/api/card", json={
+            "cardId": card_id,
+            "front": front,
+            "back": back,
+            "notes": notes
+        })
+        assert response1.status_code == 204
+        response2 = test_client.get("/api/cards")
+        assert response2.json()[0]["front"] == front
+        assert response2.json()[0]["back"] == back
+        assert response2.json()[0]["notes"] == notes
     
     # error card id does not exist
     def test_error_put_card_id_does_not_exist(self, test_client: TestClient):
-        assert True
+        create_card_and_get_card_id(test_client=test_client)
+        front = "updated front"
+        back = "updated back"
+        notes = "updated notes"
+        response1 = test_client.put("/api/card", json={
+            "cardId": "wrong-card-id",
+            "front": front,
+            "back": back,
+            "notes": notes
+        })
+        assert response1.status_code == 404
     
     # error wrong body format
     def test_error_put_wrong_body_format(self, test_client: TestClient):
-        assert True
+        create_card_and_get_card_id(test_client=test_client)
+        front = "updated front"
+        back = "updated back"
+        notes = "updated notes"
+        response1 = test_client.put("/api/card", json={
+            "front": front,
+            "back": back,
+            "notes": notes
+        })
+        assert response1.status_code == 422
 
 class TestDeleteCard:
     # delete card by id
     def test_delete_card_by_id(self, test_client: TestClient):
-        assert True
+        card_id = create_card_and_get_card_id(test_client=test_client)
+        response = test_client.delete(f"/api/card/{card_id}")
+        assert response.status_code == 204
     
     # error card id does not exist
     def test_error_delete_card_id_does_not_exist(self, test_client: TestClient):
-        assert True
+        create_card_and_get_card_id(test_client=test_client)
+        response = test_client.delete("/api/card/wrong-card-id")
+        assert response.status_code == 404
