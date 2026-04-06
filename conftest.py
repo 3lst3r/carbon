@@ -12,7 +12,8 @@ def mock_collections():
         "users": db["users"],
         "collections": db["collections"],
         "cards": db["cards"],
-        "favorites": db["favorites"]
+        "favorites": db["favorites"],
+        "categories": db["categories"]
     }
 
 @pytest.fixture(scope="function")
@@ -23,8 +24,11 @@ def client(mock_collections: dict):
         patch("src.database.collections_table", mock_collections["collections"]),
         patch("src.database.cards_table", mock_collections["cards"]),
         patch("src.database.favorites_table", mock_collections["favorites"]),
+        patch("src.database.categories_table", mock_collections["categories"]),
     ):
         from src.main import app
+        from src.database import initialize_categories
+        initialize_categories()
         yield TestClient(app), mock_collections
 
 @pytest.fixture(scope="function")

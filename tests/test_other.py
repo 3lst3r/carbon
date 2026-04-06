@@ -24,3 +24,12 @@ class TestHealth:
             "database": "up",
             "status": "ok"
         }
+
+class TestGetAllCategories:
+    def test_get_all_categories(self, test_client: TestClient):
+        response = test_client.get("/api/categories")
+        assert response.status_code == 200
+        assert type(response.json()) == type([])
+        assert len(response.json()) == 10
+        assert "label" in response.json()[0]
+        assert "value" in response.json()[0]
