@@ -30,6 +30,48 @@ def populate_database(test_client: TestClient, amount: int):
         })
     return user_id
 
+def populate_database_for_search(test_client: TestClient):
+    user_id = create_user_and_get_user_id(test_client=test_client)
+    test_client.post("/api/collection", json={
+            "userId": user_id,
+            "title": "Test Title Mathematik",
+            "categories": [
+                {
+                    "label": "Mathematik",
+                    "value": "mathematik"
+                }
+            ]
+        })
+    test_client.post("/api/collection", json={
+            "userId": user_id,
+            "title": "Test Title Deutsch",
+            "categories": [
+                {
+                    "label": "Deutsch",
+                    "value": "deutsch"
+                }
+            ]
+        })
+    test_client.post("/api/collection", json={
+            "userId": user_id,
+            "title": "Test Title Mathematik, Deutsch",
+            "categories": [
+                {
+                    "label": "Mathematik",
+                    "value": "mathematik"
+                },
+                {
+                    "label": "Deutsch",
+                    "value": "deutsch"
+                }
+            ]
+        })
+    test_client.post("/api/collection", json={
+            "userId": user_id,
+            "title": "Test Title Ohne",
+            "categories": []
+        })
+
 class TestGetAllCollections:
     # empty collection list
     def test_empty_collection_list(self, test_client: TestClient):
@@ -151,3 +193,38 @@ class TestDeleteCollection:
         response2 = test_client.get(f"/api/collection/{collection_id}")
         assert response1.status_code == 404
         assert response2.status_code == 200
+
+class TestGetCollectionBySearch:
+    # get collections by search
+    def test_get_collections_by_search(self, test_client: TestClient):
+        populate_database_for_search(test_client=test_client)
+        response = test_client.get("/api/search?query=Ohne")
+        assert response.status_code == 200
+        assert type(response.json()) == type([])
+        assert len(response.json()) == 1
+        assert response.json()[0]["title"] == "Test Title Ohne"
+
+    # get empty collection list by search
+    def test_get_empty_collections_by_search(self, test_client: TestClient):
+        populate_database_for_search(test_client=test_client)
+        response = test_client.get("/api/search?query=Mit")
+        assert response.status_code == 200
+        assert type(response.json()) == type([])
+        assert len(response.json()) == 0
+
+class TestGetCollectionByCategory:
+    # get collections by category
+    def test_get_collections_by_category(self, test_client: TestClient):
+        populate_database_for_search(test_client=test_client)
+        response = test_client.get("/api/collection_by_category/mathematik")
+        assert response.status_code == 200
+        assert type(response.json()) == type([])
+        assert len(response.json()) == 2
+
+    # get empty collection list by category search
+    def test_get_empty_collections_by_category(self, test_client: TestClient):
+        populate_database_for_search(test_client=test_client)
+        response = test_client.get("/api/collection_by_category/latein")
+        assert response.status_code == 200
+        assert type(response.json()) == type([])
+        assert len(response.json()) == 0
