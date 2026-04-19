@@ -187,7 +187,31 @@ class TestPutCard:
         assert response2.json()[0]["front"] == front
         assert response2.json()[0]["back"] == back
         assert response2.json()[0]["notes"] == notes
+
+    # put card by card id only front
+    def test_put_card_by_id_only_front(self, test_client: TestClient):
+        card_id = create_card_and_get_card_id(test_client=test_client)
+        front = "updated front"
+        response1 = test_client.put("/api/card", json={
+            "cardId": card_id,
+            "front": front
+        })
+        assert response1.status_code == 204
+        response2 = test_client.get("/api/cards")
+        assert response2.json()[0]["front"] == front
     
+    # put card by card id only back
+    def test_put_card_by_id_only_back(self, test_client: TestClient):
+        card_id = create_card_and_get_card_id(test_client=test_client)
+        back = "updated back"
+        response1 = test_client.put("/api/card", json={
+            "cardId": card_id,
+            "back": back,
+        })
+        assert response1.status_code == 204
+        response2 = test_client.get("/api/cards")
+        assert response2.json()[0]["back"] == back
+
     # error card id does not exist
     def test_error_put_card_id_does_not_exist(self, test_client: TestClient):
         create_card_and_get_card_id(test_client=test_client)
