@@ -418,7 +418,7 @@ def signup(name: str, email: str, password: str, response: Response):
 def login(email: str, password: str, response: Response):
     res = users_table.find_one({"email": email}, {"_id": 0})
     if not res:
-        raise HTTPException(status_code=404, detail="credentials not matching")
+        raise HTTPException(status_code=401, detail="invalid credentials")
     if bcrypt.checkpw(password.encode("utf-8"), res["pass_hash"]):
         token = create_access_token({
             "sub": res["email"],
@@ -436,7 +436,7 @@ def login(email: str, password: str, response: Response):
             "email": res["email"],
             "userId": str(res["userId"])
         }
-    raise HTTPException(status_code=404, detail="credentials not matching")
+    raise HTTPException(status_code=401, detail="invalid credentials")
 
 def logout(response: Response):
     response.delete_cookie(
